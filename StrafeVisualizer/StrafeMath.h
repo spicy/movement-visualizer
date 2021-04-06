@@ -1,35 +1,51 @@
 #pragma once
 #include <Eigen/Dense>
 #include "convars.h"
+#include "CMoveData.h"
+
+enum PositionType
+{
+	GROUND,
+	AIR
+};
 
 class StrafeMath
 {
-private:
-	static Eigen::Vector2d velocity;
-	static Eigen::Vector2d wishvel;
-	static Eigen::Vector2d nextVelocity;
+protected:
+	// Input/Output for this movement
+	static BasePlayer*	player;
+	CMoveData*			mv;
 
-	// Eye angles
-	static Eigen::Vector2d eyesForward;
-	static Eigen::Vector2d eyesSide;
-
-	// Keypress data
-	static float forwardmove, sidemove;
-
-	// Playerstate data
+	PositionType		positionType;
 
 public:
+	void ProcessMovement();
+
 	void PlayerMove();
+	void FinishMove();
+
+
+	void FullWalkMove();
 
 	//Ground movement
 	void WalkMove();
-	void Accelerate();
+	void Accelerate(Eigen::Vector3d& wishdir, float wishspeed, float accel);
 	void Friction();
 
 	//Air movement
 	void AirMove();
-	void AirAccelerate(Eigen::Vector2d& wishdir, float wishspeed, float accel);
+	void AirAccelerate(Eigen::Vector3d& wishdir, float wishspeed, float airaccel);
+
+	void StartGravity();
+	void FinishGravity();
+
+	void CheckVelocity();
+	void CaptureMovementKeys();
+
+
 
 	//Other
-	void AngleVectors(const double yaw, Eigen::Vector2d& forward, Eigen::Vector2d& right);
+	void AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward, Eigen::Vector3d& right, Eigen::Vector3d& up);
+	double VecMagnitude(Eigen::Vector3d& vec);
+	double DotProduct(Eigen::Vector3d& a, Eigen::Vector3d& b);
 };

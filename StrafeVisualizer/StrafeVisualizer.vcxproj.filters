@@ -44,6 +44,9 @@
     <ClInclude Include="convars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CMoveData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

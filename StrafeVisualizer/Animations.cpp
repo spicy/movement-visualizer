@@ -1,6 +1,7 @@
 #define NOGDI
 #include "Animations.h"
 #include "DrawUtil.h"
+#include "StrafeMath.h"
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -47,16 +48,6 @@ static bool UpdateMode(T& mode)
     return false;
 }
 
-static inline Eigen::Vector3d OuterProd(const Eigen::Vector2d& v) 
-{
-    return Eigen::Vector3d(v.x()*v.x(), 2.0*v.x()*v.y(), v.y()*v.y());
-}
-
-static inline Eigen::Vector3d OuterProdR(const Eigen::Vector2d& v) 
-{
-    return Eigen::Vector3d(v.y()*v.y(), -v.x()*v.y(), v.x()*v.x());
-}
-
 static inline double IntersectT(const Eigen::Vector2d& p1, const Eigen::Vector2d& v1, const Eigen::Vector2d& p2, const Eigen::Vector2d& v2)
 {
     Eigen::Matrix2d x;
@@ -69,23 +60,13 @@ static inline Eigen::Vector2d Intersect(const Eigen::Vector2d& p1, const Eigen::
     return p1 + IntersectT(p1, v1, p2, v2)*v1;
 }
 
-static inline Eigen::Matrix2d PermuteMatrix(const Eigen::Matrix2d& u, const Eigen::Vector3d M)
-{
-    Eigen::Matrix2d result = Eigen::Matrix2d::Identity();
-    if (M(0)*M(2) < M(1)*M(1) && u.determinant() * (M(0) - M(2)) < 0.0)
-    {
-        result.col(0).swap(result.col(1));
-    }
-    return result;
-}
-
 bool Animations::Background(sf::RenderTarget& window, bool start_anim)
 {
     static double tolerance = 0.0;
     DrawUtil::DrawGrid(window, tolerance);
     if (start_anim) 
     {
-        tolerance = std::min(tolerance + 0.02, 1.0);
+        tolerance = std::min(tolerance + 0.04, 1.0);
     }
     return animate_out;
 }

@@ -479,3 +479,8 @@ StrafeVisualizer/Debug/StrafeVisualizer.vcxproj.FileListAbsolute.txt
 *.idb
 *.iobj
 *.ipdb
+.vs/StrafeVisualizer/v16/ipch/AutoPCH/4e903c52816e903b/STRAFEMATH.ipch
+.vs/StrafeVisualizer/v16/Browse.VC.db-wal
+.vs/StrafeVisualizer/v16/Browse.VC.db-shm
+.vs/StrafeVisualizer/v16/Browse.VC.opendb
+*.ipch

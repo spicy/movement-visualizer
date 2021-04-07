@@ -8,7 +8,7 @@
 
 Eigen::Vector2d DrawUtil::center = Eigen::Vector2d::Zero();
 double DrawUtil::scale = 100.0;
-float DrawUtil::render_scale = 1.0f;
+float DrawUtil::render_scale = 2.0f;
 
 
 /// <summary>
@@ -43,6 +43,16 @@ void DrawUtil::DrawCircle(sf::RenderTarget& window, const Eigen::Vector2d& c, co
     window.draw(circle);
 }
 
+/// <summary>
+/// 
+/// </summary>
+void DrawUtil::DrawRect(sf::RenderTarget& window, const float x, const float y, const sf::Vector2f& size, const sf::Color& color)
+{
+    sf::RectangleShape rect(size);
+    rect.setPosition(x, y);
+    rect.setFillColor(color);
+    window.draw(rect);
+}
 
 /// <summary>
 /// 
@@ -103,6 +113,18 @@ void DrawUtil::DrawArrow(sf::RenderTarget& window, const Eigen::Vector2d& start,
 }
 
 
+void DrawUtil::DrawTextSF(sf::RenderTarget& window, const float x, const float y, sf::Font font, sf::String& string, int pixelSize, const sf::Color& color)
+{
+    sf::Text text;
+    text.setFont(font);
+    text.setString(string);
+    text.setCharacterSize(pixelSize);
+    text.setFillColor(color);
+    text.setStyle(sf::Text::Style::Regular);
+    text.setPosition(x, y);
+    // inside the main loop, between window.clear() and window.display()
+    window.draw(text);
+}
 
 /// <summary>
 /// 

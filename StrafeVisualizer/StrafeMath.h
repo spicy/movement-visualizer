@@ -14,9 +14,8 @@ class StrafeMath
 protected:
 	// Input/Output for this movement
 	static BasePlayer*	player;
-	CMoveData*			mv;
-
-	PositionType		positionType;
+	static CMoveData*	mv;
+	static PositionType	positionType;
 
 public:
 	void ProcessMovement();

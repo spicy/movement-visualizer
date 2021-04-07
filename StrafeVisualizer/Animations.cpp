@@ -7,7 +7,6 @@
 #include <sstream>
 #include <cassert>
 #include <fstream>
-
 #define RUN_ONCE static int once = 0; if (!once && !once++)
 
 Eigen::Vector2d Animations::moveable_points[2];
@@ -15,12 +14,17 @@ Eigen::Vector2d Animations::unfiltered_points[2];
 int Animations::frame = 0;
 bool Animations::animate_out = false;
 
+BasePlayer*     StrafeMath::player;
+CMoveData*      StrafeMath::mv;
+PositionType	StrafeMath::positionType;
+
+
 static bool UpdateTolerance(double& tolerance, double tolerance_in, double tolerance_out)
 {
     if (Animations::animate_out) 
     {
         tolerance = std::max(tolerance - tolerance_out, 0.0);
-      return tolerance <= 0.0;
+        return tolerance <= 0.0;
     } 
     else 
     {
@@ -83,6 +87,7 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
 
     static Mode mode = MODE_POINTS;
     static double tolerance = 0;
+    static double snappy_tolerance = 0;
 
     RUN_ONCE
     {
@@ -105,12 +110,38 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
     }
     else if (mode >= MODE_ARROWS)
     {
-        //Draw arrows instead of pts and lines
-        DrawUtil::DrawLine(window, DrawUtil::center, ptVelocity, sf::Color(14, 60, 158), false, 20.0 * bounce);
-        DrawUtil::DrawLine(window, DrawUtil::center, ptYaw, sf::Color(138, 23, 15), false, 20.0 * bounce);
-        DrawUtil::DrawPoint(window, ptVelocity, sf::Color(14, 60, 158), 20.0 * bounce);
-        DrawUtil::DrawPoint(window, ptYaw, sf::Color(138, 23, 15), 20.0 * bounce);
-        DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0f * bounce);
+        RUN_ONCE
+        {
+            tolerance = 0;
+        }
+
+        DrawUtil::DrawLine(window, DrawUtil::center, ptVelocity, sf::Color(14, 60, 158), false, 20.0 * tolerance);
+        DrawUtil::DrawLine(window, DrawUtil::center, ptYaw, sf::Color(138, 23, 15), false, 20.0 * tolerance);
+        DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0);
+        DrawUtil::DrawPoint(window, ptVelocity, sf::Color(14, 60, 158), 20.0);
+        DrawUtil::DrawPoint(window, ptYaw, sf::Color(138, 23, 15), 20.0);
+
+        sf::Font font;
+        if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
+        {
+            sf::String velxy = "velx: " + std::to_string(ptVelocity[0]) + "\nvely: " + std::to_string(ptVelocity[1]);
+            DrawUtil::DrawTextSF(window, ptVelocity[0] + 15, ptVelocity[1] + 15, font, velxy, 100, sf::Color(255, 255, 255, 255 * tolerance + 0.5));
+        }
+    }
+    if (mode == MODE_TEXT1)
+    {
+        sf::Vector2u screenDimensions = window.getSize();
+        const int quarterRightOfScreen = screenDimensions.x * 0.75;
+        //Draw a text border box on the right hand side
+        DrawUtil::DrawRect(window, quarterRightOfScreen, 0, (sf::Vector2f)screenDimensions, sf::Color(61, 61, 60, 220 * tolerance));
+
+        //Draw the text over it
+        sf::Font font;
+        if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
+        {
+            sf::String velxy = "yeet";
+            DrawUtil::DrawTextSF(window, quarterRightOfScreen * 1.1, 300, font, velxy, 100, sf::Color::White);
+        }
     }
 
     UpdateTolerance(tolerance, 0.02, 0.04);

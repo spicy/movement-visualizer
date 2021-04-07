@@ -4,11 +4,6 @@
 #define M_PI 3.1415926535 
 #endif
 
-inline void VectorScale(const Eigen::Vector3d& in, float scale, Eigen::Vector3d& result)
-{
-	VectorMultiply(in, scale, result);
-}
-
 inline void VectorMultiply(const Eigen::Vector3d& a, float b, Eigen::Vector3d& c)
 {
 	c[0] = a[0] * b;
@@ -16,6 +11,10 @@ inline void VectorMultiply(const Eigen::Vector3d& a, float b, Eigen::Vector3d& c
 	c[2] = a[2] * b;
 }
 
+inline void VectorScale(const Eigen::Vector3d& in, float scale, Eigen::Vector3d& result)
+{
+	VectorMultiply(in, scale, result);
+}
 
 
 void StrafeMath::ProcessMovement()
@@ -132,9 +131,9 @@ void StrafeMath::WalkMove()
 	spd = VecMagnitude(player->m_vecVelocity);
 
 	// first try just moving to the destination	
-	dest[0] = mv->GetAbsOrigin()[0] + mv->m_vecVelocity[0] * intervalPerTick;
-	dest[1] = mv->GetAbsOrigin()[1] + mv->m_vecVelocity[1] * intervalPerTick;
-	dest[2] = mv->GetAbsOrigin()[2];
+	dest[0] = mv->m_vecAbsOrigin[0] + mv->m_vecVelocity[0] * intervalPerTick;
+	dest[1] = mv->m_vecAbsOrigin[1] + mv->m_vecVelocity[1] * intervalPerTick;
+	dest[2] = mv->m_vecAbsOrigin[2];
 
 	// first try moving directly to the next spot
 	//TracePlayerBBox(mv->GetAbsOrigin(), dest, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm);
@@ -252,6 +251,8 @@ void StrafeMath::AirMove()
 	wishdir = wishvel;
 	wishdir.normalize();
 
+	wishspeed = VecMagnitude(wishvel);
+
 	if (wishspeed != 0 && (wishspeed > mv->m_flMaxSpeed))
 	{
 		VectorScale(wishvel, mv->m_flMaxSpeed / wishspeed, wishvel);
@@ -259,7 +260,6 @@ void StrafeMath::AirMove()
 	}
 
 	AirAccelerate(wishdir, wishspeed, sv_airAccelerate);
-
 	//TryPlayerMove();
 }
 
@@ -340,15 +340,15 @@ void StrafeMath::CaptureMovementKeys()
 void StrafeMath::StartGravity()
 {
 	float ent_gravity;
-
-	if (player->GetGravity())
-		ent_gravity = player->GetGravity();
+	//mv->m_fl
+	if (player->m_flGravity)
+		ent_gravity = player->m_flGravity;
 	else
 		ent_gravity = 1.0;
 
 	// Add gravity so they'll be in the correct position during movement
 	// yes, this 0.5 looks wrong, but it's not.  
-	mv->m_vecVelocity[2] -= (ent_gravity * GetCurrentGravity() * 0.5 * intervalPerTick);
+	mv->m_vecVelocity[2] -= (ent_gravity * sv_gravity * 0.5 * intervalPerTick);
 
 	CheckVelocity();
 }
@@ -357,13 +357,13 @@ void StrafeMath::FinishGravity()
 {
 	float ent_gravity;
 
-	if (player->GetGravity())
-		ent_gravity = player->GetGravity();
+	if (player->m_flGravity)
+		ent_gravity = player->m_flGravity;
 	else
 		ent_gravity = 1.0;
 
 	// Get the correct velocity for the end of the dt 
-	mv->m_vecVelocity[2] -= (ent_gravity * GetCurrentGravity() * intervalPerTick * 0.5);
+	mv->m_vecVelocity[2] -= (ent_gravity * sv_gravity * intervalPerTick * 0.5);
 
 	CheckVelocity();
 }

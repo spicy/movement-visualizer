@@ -12,13 +12,13 @@
 static const int start_w = 1280;
 static const int start_h = 720;
 static const bool start_fullscreen = false;
-static const int render_scale = 1;
+static const int render_scale = 2;
 
 static int cur_anim = -1;
 static sf::Vector2i mouse_pos;
 static bool mouse_pressed = false;
 static int mouse_select = -1;
-static const double pt_smoothing = 0.8;
+static const double pt_smoothing = 0.7;
 
 static bool(*ANIM_ARRAY[])(sf::RenderTarget& window) =
 {

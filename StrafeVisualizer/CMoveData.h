@@ -26,23 +26,8 @@ public:
 	float			m_outStepHeight;	// how much you climbed this move
 	Eigen::Vector3d	m_outWishVel;		// This is where you tried 
 	Eigen::Vector3d	m_outJumpVel;		// This is your jump velocity
-
-	void  SetAbsOrigin(const Eigen::Vector3d& vec);
-	const Eigen::Vector3d& GetAbsOrigin() const;
-
-private:
 	Eigen::Vector3d m_vecAbsOrigin;		// edict::origin
 };
-
-void CMoveData::SetAbsOrigin(const Eigen::Vector3d& vec)
-{
-	m_vecAbsOrigin = vec;
-}
-
-inline const Eigen::Vector3d& CMoveData::GetAbsOrigin() const
-{
-	return m_vecAbsOrigin;
-}
 
 class BasePlayer
 {
@@ -55,4 +40,5 @@ public:
 	Eigen::Vector3d		m_vecWishVel;
 
 	float				m_surfaceFriction;
+	float				m_flGravity;
 };

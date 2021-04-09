@@ -5,8 +5,11 @@
 class Animations 
 {
 public:
-	static Eigen::Vector2d unfiltered_points[2];
-	static Eigen::Vector2d moveable_points[2];
+	static Eigen::Vector2d unfilteredPts[2];
+	static Eigen::Vector2d moveablePts[2];
+	static Eigen::Vector2d vecVelocity;
+	static Eigen::Vector2d vecYaw;
+
 	static int frame;
 	static bool animate_out;
 

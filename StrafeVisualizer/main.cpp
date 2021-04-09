@@ -1,6 +1,4 @@
 #define NOGDI
-#include "Animations.h"
-#include "DrawUtil.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
@@ -9,36 +7,34 @@
 #include <cassert>
 #include <fstream>
 
-static const int start_w = 1280;
-static const int start_h = 720;
-static const bool start_fullscreen = false;
-static const int render_scale = 2;
+#include "Animations.h"
+#include "DrawUtil.h"
+#include "Settings.h"
+#include "MouseSharedDefs.h"
 
-static int cur_anim = -1;
-static sf::Vector2i mouse_pos;
-static bool mouse_pressed = false;
-static int mouse_select = -1;
-static const double pt_smoothing = 0.7;
+int cur_anim = -1;
+const double pt_smoothing = 0.7;
 
 static bool(*ANIM_ARRAY[])(sf::RenderTarget& window) =
 {
   Animations::ShowVectors
 };
+
 static const int NUM_ANIMS = sizeof(ANIM_ARRAY) / sizeof(ANIM_ARRAY[0]);
 
 static void ActivatePoint(const sf::RenderTarget& window) 
 {
-  const Eigen::Vector2d p = DrawUtil::FromPix(window, mouse_pos * render_scale);
+  const Eigen::Vector2d p = DrawUtil::FromPix(window, mouse.pos * settings.video.render_scale);
   for (int i = 0; i < 2; ++i) 
   {
-    const double d = (Animations::moveable_points[i] - p).norm();
-    if (d * DrawUtil::scale < 10.0 * render_scale) 
+    const double d = (Animations::moveablePts[i] - p).norm();
+    if (d * DrawUtil::scale < 10.0 * settings.video.render_scale)
     {
-      mouse_select = i;
+      mouse.select = i;
       return;
     }
   }
-  mouse_select = -1;
+  mouse.select = -1;
 }
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
@@ -50,28 +46,28 @@ int main(int argc, char *argv[]) {
 #endif
     //Get the screen size
     sf::VideoMode screenSize = sf::VideoMode::getDesktopMode();
-    screenSize = sf::VideoMode(start_w, start_h, screenSize.bitsPerPixel);
-    DrawUtil::render_scale = float(render_scale) * 0.5f;
+    screenSize = sf::VideoMode(settings.video.start_w, settings.video.start_h, screenSize.bitsPerPixel);
+    DrawUtil::render_scale = float(settings.video.render_scale) * 0.5f;
     
     //GL settings
-    sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
-    settings.antialiasingLevel = 16;
-    settings.majorVersion = 2;
-    settings.minorVersion = 0;
+    sf::ContextSettings cSettings;
+    cSettings.depthBits = 24;
+    cSettings.stencilBits = 8;
+    cSettings.antialiasingLevel = 16;
+    cSettings.majorVersion = 2;
+    cSettings.minorVersion = 0;
 
     //Create the window
     sf::RenderWindow window;
-    sf::Uint32 window_style = (start_fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close);
-    window.create(screenSize, "Strafe Visualizer by spicy", window_style, settings);
+    sf::Uint32 window_style = (settings.video.start_fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close);
+    window.create(screenSize, "Strafe Visualizer by spicy", window_style, cSettings);
     window.setFramerateLimit(60);
     window.requestFocus();
     sf::View view = window.getDefaultView();
 
     //Create the render texture 4 times larger than the window
     sf::RenderTexture renderTexture;
-    renderTexture.create(window.getSize().x * render_scale, window.getSize().y * render_scale, settings);
+    renderTexture.create(window.getSize().x * settings.video.render_scale, window.getSize().y * settings.video.render_scale, cSettings);
     renderTexture.setSmooth(true);
     renderTexture.setActive(true);
 
@@ -84,13 +80,13 @@ int main(int argc, char *argv[]) {
 
     //Create geometry
     DrawUtil::center = Eigen::Vector2d::Zero();
-    DrawUtil::scale = 130.0 * render_scale;
-    Animations::unfiltered_points[0] = Eigen::Vector2d(-1, 0);
-    Animations::unfiltered_points[1] = Eigen::Vector2d(0, 1);
+    DrawUtil::scale = 75 * settings.video.render_scale; //130 before
+    Animations::unfilteredPts[0] = Eigen::Vector2d(1, 0);
+    Animations::unfilteredPts[1] = Eigen::Vector2d(1, 0);
 
     for (int i = 0; i < 2; ++i)
     {
-        Animations::moveable_points[i] = Animations::unfiltered_points[i];
+        Animations::moveablePts[i] = Animations::unfilteredPts[i];
     }
 
     //Main Loop
@@ -133,39 +129,39 @@ int main(int argc, char *argv[]) {
             {
                 const sf::FloatRect visibleArea(0, 0, (float)event.size.width, (float)event.size.height);
                 window.setView(sf::View(visibleArea));
-                renderTexture.create(window.getSize().x * render_scale, window.getSize().y * render_scale, settings);
+                renderTexture.create(window.getSize().x * settings.video.render_scale, window.getSize().y * settings.video.render_scale, cSettings);
                 renderTexture.setSmooth(true);
                 renderTexture.setActive(true);
             }
             else if (event.type == sf::Event::MouseMoved)
             {
-                mouse_pos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
+                 mouse.pos = sf::Vector2i(event.mouseMove.x, event.mouseMove.y);
             }
             else if (event.type == sf::Event::MouseButtonPressed)
             {
-                mouse_pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-                mouse_pressed = true;
+                mouse.pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+                mouse.pressed = true;
                 ActivatePoint(renderTexture);
             }
             else if (event.type == sf::Event::MouseButtonReleased)
             {
-                mouse_pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
-                mouse_pressed = false;
-                mouse_select = -1;
+                mouse.pos = sf::Vector2i(event.mouseButton.x, event.mouseButton.y);
+                mouse.pressed = false;
+                mouse.select = -1;
             }
         }
 
         //Move active point
-        if (mouse_select >= 0)
+        if (mouse.select >= 0)
         {
-            Animations::unfiltered_points[mouse_select] = DrawUtil::FromPix(renderTexture, mouse_pos * render_scale);
+            Animations::unfilteredPts[mouse.select] = DrawUtil::FromPix(renderTexture, mouse.pos * settings.video.render_scale);
         }
 
         //Filter points
         for (int i = 0; i < 2; ++i) 
         {
-            Animations::moveable_points[i] *= pt_smoothing;
-            Animations::moveable_points[i] += Animations::unfiltered_points[i] * (1.0 - pt_smoothing);
+            Animations::moveablePts[i] *= pt_smoothing;
+            Animations::moveablePts[i] += Animations::unfilteredPts[i] * (1.0 - pt_smoothing);
         }
 
         //Draw the background
@@ -186,7 +182,7 @@ int main(int argc, char *argv[]) {
         window.setActive(true);
         const sf::Texture& texture = renderTexture.getTexture();
         sf::Sprite sprite(texture);
-        sprite.setScale(1.0f / float(render_scale), 1.0f / float(render_scale));
+        sprite.setScale(1.0f / float(settings.video.render_scale), 1.0f / float(settings.video.render_scale));
         window.draw(sprite);
 
         //Take a single screen-shot

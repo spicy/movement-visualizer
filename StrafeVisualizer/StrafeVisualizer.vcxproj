@@ -160,6 +160,8 @@
     <ClInclude Include="CMoveData.h" />
     <ClInclude Include="convars.h" />
     <ClInclude Include="DrawUtil.h" />
+    <ClInclude Include="MouseSharedDefs.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="StrafeMath.h" />
   </ItemGroup>
   <ItemGroup>

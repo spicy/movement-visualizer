@@ -7,9 +7,8 @@
 #endif
 
 Eigen::Vector2d DrawUtil::center = Eigen::Vector2d::Zero();
-double DrawUtil::scale = 100.0;
+double DrawUtil::scale = 75;
 float DrawUtil::render_scale = 2.0f;
-
 
 /// <summary>
 /// 
@@ -192,8 +191,6 @@ Eigen::Vector2d DrawUtil::FromPix(const sf::RenderTarget& window, const sf::Vect
     return Eigen::Vector2d(double(p.x) - window.getSize().x*0.5, double(p.y) - window.getSize().y*0.5) / scale + center;
 }
 
-
-
 /// <summary>
 /// 
 /// </summary>
@@ -201,7 +198,6 @@ double DrawUtil::SmoothBounce(double tolerance, double trigger_tolerance, double
 {
     return std::max(1.0 + a*(1.0 - tolerance)*std::exp(10*(trigger_tolerance - tolerance))*(1.0 - std::exp(trigger_tolerance - tolerance)), 0.0);
 }
-
 
 
 /// <summary>

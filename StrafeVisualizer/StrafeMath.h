@@ -11,12 +11,6 @@ enum PositionType
 
 class StrafeMath
 {
-protected:
-	// Input/Output for this movement
-	static BasePlayer*	player;
-	static CMoveData*	mv;
-	static PositionType	positionType;
-
 public:
 	void ProcessMovement();
 
@@ -41,10 +35,13 @@ public:
 	void CheckVelocity();
 	void CaptureMovementKeys();
 
-
-
 	//Other
 	void AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward, Eigen::Vector3d& right, Eigen::Vector3d& up);
 	double VecMagnitude(Eigen::Vector3d& vec);
 	double DotProduct(Eigen::Vector3d& a, Eigen::Vector3d& b);
+
+	// Input/Output for this movement
+	static BasePlayer* player;
+	static CMoveData* mv;
+	static PositionType	positionType;
 };

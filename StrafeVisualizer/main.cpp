@@ -11,6 +11,7 @@
 #include "DrawUtil.h"
 #include "Settings.h"
 #include "MouseSharedDefs.h"
+#include "convars.h"
 
 int cur_anim = -1;
 const double pt_smoothing = 0.7;
@@ -94,37 +95,72 @@ int main(int argc, char *argv[]) {
     while (window.isOpen()) 
     {
         sf::Event event;
-        while (window.pollEvent(event)) 
+        while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
             {
                 window.close();
                 break;
-            } 
+            }
             else if (event.type == sf::Event::KeyPressed)
             {
-                const sf::Keyboard::Key keycode = event.key.code;
+                sf::Keyboard::Key keycode = event.key.code;
                 if (keycode == sf::Keyboard::Escape)
                 {
                     window.close();
                     break;
-                } 
+                }
                 else if (keycode == sf::Keyboard::Space)
                 {
-                    if (cur_anim > 0) 
+                    if (cur_anim > 0)
                     {
                         Animations::animate_out = true;
-                    } 
+                    }
                     else
                     {
-                       cur_anim += 1;
+                        cur_anim += 1;
                     }
                 }
-                else if (keycode == sf::Keyboard::C) 
+                else if (keycode == sf::Keyboard::C)
                 {
                     capture = true;
                 }
-            } 
+
+                switch (keycode)
+                {
+                case sf::Keyboard::W:
+                    Animations::WASD[0] = 1;
+                    break;
+                case sf::Keyboard::S:
+                    Animations::WASD[1] = 1;
+                    break;
+                case sf::Keyboard::A:
+                    Animations::WASD[2] = 1;
+                    break;
+                case sf::Keyboard::D:
+                    Animations::WASD[3] = 1;
+                    break;
+                }
+            }
+            else if (event.type == sf::Event::KeyReleased)
+            {
+                sf::Keyboard::Key keycode = event.key.code;
+                switch (keycode)
+                {
+                case sf::Keyboard::W:
+                    Animations::WASD[0] = 0;
+                    break;
+                case sf::Keyboard::S:
+                    Animations::WASD[1] = 0;
+                    break;
+                case sf::Keyboard::A:
+                    Animations::WASD[2] = 0;
+                    break;
+                case sf::Keyboard::D:
+                    Animations::WASD[3] = 0;
+                    break;
+                }
+            }
             else if (event.type == sf::Event::Resized)
             {
                 const sf::FloatRect visibleArea(0, 0, (float)event.size.width, (float)event.size.height);

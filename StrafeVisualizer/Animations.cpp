@@ -20,8 +20,10 @@ Eigen::Vector2d Animations::moveablePts[2];        // moveablePts is the filtere
 Eigen::Vector2d Animations::unfilteredPts[2];      // unfilteredPts is some point on the screen (not pixels)
 Eigen::Vector2d Animations::vecVelocity;           // moveablePts[0] multiplied by some scalar
 Eigen::Vector2d Animations::vecYaw;                // Unit vector of moveablePts[1];
+
 int Animations::frame = 0;
 bool Animations::animate_out = false;
+Eigen::Vector4i Animations::WASD;
 
 BasePlayer*     StrafeMath::player;
 CMoveData*      StrafeMath::mv;
@@ -201,18 +203,39 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
 
                 const int boxX = 70;
                 const int boxY = 200;
-
                 sf::String text2 = "Lets construct the angle we are looking at";
-                sf::String text3 = "arctangent(              ) (to deg)";
-                sf::String xval = std::to_string(vecYaw[0]);
-                sf::String yval = std::to_string(vecYaw[1]);
+                sf::String text3 = "arctangent(                ) (to deg)";
+                sf::String xval = "x:" + std::to_string(vecYaw[0]);
+                sf::String yval = "y:" + std::to_string(vecYaw[1]);
                 sf::String theta = std::to_string(atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI)) + "°";
-                DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(700, 330), sf::Color(61, 61, 60, 230 * tolerance));
+
+                DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(720, 330), sf::Color(61, 61, 60, 230 * tolerance));
+
                 DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 30 + ptYaw[1], font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 100 + ptYaw[1], font, text3, 60, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, boxX + 300 + ptYaw[0], boxY + 95 + ptYaw[1], font, yval, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, boxX + 300 + ptYaw[0], boxY + 130 + ptYaw[1], font, xval, 40, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, boxX + 140 + ptYaw[0], boxY + 200 + ptYaw[1], font, theta, 80, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, boxX + 200 + ptYaw[0], boxY + 200 + ptYaw[1], font, theta, 80, sf::Color(255, 255, 255, 255 * tolerance));
+            }
+            else if (mode == MODE_TEXT3)
+            {
+                sf::String text = "yeet.";
+                DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 420, 0, sf::Vector2f(840, 150), sf::Color(61, 61, 60, 240));
+                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+            }
+            else if (mode == MODE_KEYS)
+            {
+                int fwdmv = 0, sidemv = 0;
+                if (WASD[0]) fwdmv += sv_walkspeed;
+                if (WASD[1]) fwdmv -= sv_walkspeed;
+                if (WASD[2]) sidemv -= sv_walkspeed;
+                if (WASD[3]) sidemv += sv_walkspeed;
+
+                sf::String text = std::to_string(fwdmv);
+                sf::String text2 = std::to_string(sidemv);
+                DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 420, 0, sf::Vector2f(840, 150), sf::Color(61, 61, 60, 240));
+                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 60, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
             }
         }
     }

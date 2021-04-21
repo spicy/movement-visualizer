@@ -1,9 +1,10 @@
-#define NOGDI
+﻿#define NOGDI
 #include <iostream>
 #include <random>
 #include <sstream>
-#include <cassert>
+//#include <cassert>
 #include <fstream>
+#include <assert.h>
 
 #include "Animations.h"
 #include "Settings.h"
@@ -25,9 +26,9 @@ int Animations::frame = 0;
 bool Animations::animate_out = false;
 Eigen::Vector4i Animations::WASD;
 
-BasePlayer*     StrafeMath::player;
-CMoveData*      StrafeMath::mv;
-PositionType	StrafeMath::positionType;
+BasePlayer*      StrafeMath::player;
+CMoveData*       StrafeMath::mv;
+PositionType	 StrafeMath::positionType;
 
 
 static bool UpdateTolerance(double& tolerance, double tolerance_in, double tolerance_out)
@@ -69,18 +70,6 @@ inline double VecMagnitude(Eigen::Vector2d& vec)
     return std::sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
 }
 
-static inline double IntersectT(const Eigen::Vector2d& p1, const Eigen::Vector2d& v1, const Eigen::Vector2d& p2, const Eigen::Vector2d& v2)
-{
-    Eigen::Matrix2d x;
-    x << v1, v2;
-    return (x.inverse() * (p2 - p1))(0);
-}
-
-static inline Eigen::Vector2d Intersect(const Eigen::Vector2d& p1, const Eigen::Vector2d& v1, const Eigen::Vector2d& p2, const Eigen::Vector2d& v2) 
-{
-    return p1 + IntersectT(p1, v1, p2, v2)*v1;
-}
-
 bool Animations::Background(sf::RenderTarget& window, bool start_anim)
 {
     static double tolerance = 0.0;
@@ -92,35 +81,32 @@ bool Animations::Background(sf::RenderTarget& window, bool start_anim)
     return animate_out;
 }
 
-bool Animations::ShowVectors(sf::RenderTarget& window)
+bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 {
-    enum Mode 
-    {
-        MODE_POINTS,
-        MODE_TEXT1,
-        MODE_ARROWS,
-        MODE_TEXT2,
-        MODE_EYEANGLES,
-        MODE_TEXT3,
-        MODE_KEYS,
-        MODE_WISHDIR,
-        MODE_WISHVEL_EYEANGLES,
-        MODE_END
-    };
-
-    static Mode mode = MODE_POINTS;
-    static double tolerance = 0;
-    static double snappy_tolerance = 0;
-
-    sf::Vector2u screenDimensions = window.getSize();
-
     RUN_ONCE
     {
       unfilteredPts[0] = Eigen::Vector2d(1, 0);
       unfilteredPts[1] = Eigen::Vector2d(1, 0);
     }
 
-    //Get points
+    enum Mode 
+    {
+        MODE_POINTS,
+        MODE_TEXT1,
+        MODE_ARROWS,
+        MODE_TEXT2,
+        MODE_VIEWANGLES,
+        MODE_KEYS,
+        MODE_EYEANGLES,
+        MODE_WISHVEL_EYEANGLES,
+        MODE_END
+    };
+
+    static Mode mode = MODE_POINTS;
+    static double tolerance = 0;
+    sf::Vector2u screenDimensions = window.getSize();
+
+    // Get points
     const Eigen::Vector2d& ptVelocity = moveablePts[0];
     const Eigen::Vector2d& ptYaw = moveablePts[1];
 
@@ -129,6 +115,7 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
     Animations::vecVelocity[0] = Animations::moveablePts[0][0] * DrawUtil::scale;
     Animations::vecVelocity[1] = -Animations::moveablePts[0][1] * DrawUtil::scale; //flip y axis sign
 
+    // Make unit vector
     Animations::vecYaw[0] = Animations::moveablePts[1][0] / VecMagnitude(moveablePts[1]); //make unit vector
     Animations::vecYaw[1] = -Animations::moveablePts[1][1] / VecMagnitude(moveablePts[1]); //make unit vector
 
@@ -184,7 +171,7 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
             DrawUtil::DrawRect(window, 100 + ptVelocity[0], 100 + ptVelocity[1], sf::Vector2f(500, 300), sf::Color(61, 61, 60, 230 * tolerance));
             DrawUtil::DrawTextSF(window, 130 + ptVelocity[0], 130 + ptVelocity[1], font, velxy, 60, sf::Color(255, 255, 255, 255 * tolerance + 0.5));
         }
-        else if (mode >= MODE_EYEANGLES)
+        else if (mode == MODE_VIEWANGLES)
         {
             RUN_ONCE
             {
@@ -195,47 +182,131 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
             DrawUtil::DrawPoint(window, ptYaw, sf::Color(191, 55, 10), 20.0 * bounce);
             DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0 * bounce);
 
-            if (mode == MODE_EYEANGLES)
-            {
-                sf::String text = "This vector will represent the direction we are looking towards.\n Its length does not matter since we will only use its direction";
-                DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 500, 0, sf::Vector2f(1000, 150), sf::Color(61, 61, 60, 240));
-                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 500 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+            sf::String text = "This vector will represent the direction we are looking towards.\n Its length does not matter since we will only use its direction";
+            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 500, 0, sf::Vector2f(1000, 150), sf::Color(61, 61, 60, 240));
+            DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 500 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
 
-                const int boxX = 70;
-                const int boxY = 200;
-                sf::String text2 = "Lets construct the angle we are looking at";
-                sf::String text3 = "arctangent(                ) (to deg)";
-                sf::String xval = "x:" + std::to_string(vecYaw[0]);
-                sf::String yval = "y:" + std::to_string(vecYaw[1]);
-                sf::String theta = std::to_string(atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI)) + "�";
+            const int boxX = 70;
+            const int boxY = 200;
+            sf::String text2 = "Lets construct the angle we are looking at";
+            sf::String text3 = "arctangent(                ) (to deg)";
+            sf::String xval = "x:" + std::to_string(vecYaw[0]);
+            sf::String yval = "y:" + std::to_string(vecYaw[1]);
+            sf::String theta = std::to_string(atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI)) + "°";
 
-                DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(720, 330), sf::Color(61, 61, 60, 230 * tolerance));
+            DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(720, 330), sf::Color(61, 61, 60, 230));
 
-                DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 30 + ptYaw[1], font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 100 + ptYaw[1], font, text3, 60, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, boxX + 300 + ptYaw[0], boxY + 95 + ptYaw[1], font, yval, 40, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, boxX + 300 + ptYaw[0], boxY + 130 + ptYaw[1], font, xval, 40, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, boxX + 200 + ptYaw[0], boxY + 200 + ptYaw[1], font, theta, 80, sf::Color(255, 255, 255, 255 * tolerance));
-            }
-            else if (mode == MODE_TEXT3)
+            DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 30 + ptYaw[1], font, text2, 40, sf::Color(255, 255, 255));
+            DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 100 + ptYaw[1], font, text3, 60, sf::Color(255, 255, 255));
+            DrawUtil::DrawTextSF(window, boxX + 300 + ptYaw[0], boxY + 95 + ptYaw[1], font, yval, 40, sf::Color(255, 255, 255));
+            DrawUtil::DrawTextSF(window, boxX + 300 + ptYaw[0], boxY + 130 + ptYaw[1], font, xval, 40, sf::Color(255, 255, 255));
+            DrawUtil::DrawTextSF(window, boxX + 200 + ptYaw[0], boxY + 200 + ptYaw[1], font, theta, 80, sf::Color(255, 255, 255));
+        }
+        else
+        {
+            DrawUtil::DrawLine(window, DrawUtil::center, ptYaw, sf::Color(191, 55, 10, 255), false, 20.0);
+            DrawUtil::DrawPoint(window, ptYaw, sf::Color(191, 55, 10), 20.0);
+            DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0);
+
+            if (mode == MODE_KEYS)
             {
-                sf::String text = "yeet.";
-                DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 420, 0, sf::Vector2f(840, 150), sf::Color(61, 61, 60, 240));
-                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
-            }
-            else if (mode == MODE_KEYS)
-            {
+                RUN_ONCE
+                {
+                    tolerance = 0;
+                }
+
                 int fwdmv = 0, sidemv = 0;
                 if (WASD[0]) fwdmv += sv_walkspeed;
                 if (WASD[1]) fwdmv -= sv_walkspeed;
                 if (WASD[2]) sidemv -= sv_walkspeed;
                 if (WASD[3]) sidemv += sv_walkspeed;
 
-                sf::String text = std::to_string(fwdmv);
-                sf::String text2 = std::to_string(sidemv);
-                DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 420, 0, sf::Vector2f(840, 150), sf::Color(61, 61, 60, 240));
-                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 60, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                sf::String text = "We can create two variables that handle the value\nof our forward and sideways movement speed.";
+                sf::String text2 = "This is so we can isolate our intended direction\n(ie. LEFT, FORWARD-RIGHT) to its components\nfor math later.\n\n";
+                sf::String text3 = "Test out some keypresses with WASD!\nForwardmove: " + std::to_string(fwdmv) + "\nSidemove: " + std::to_string(sidemv);
+                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(800, 550), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 150, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 350, font, text3, 40, sf::Color(255, 255, 255, 255 * tolerance));
+            }
+            else if (mode == MODE_EYEANGLES)
+            {
+                RUN_ONCE
+                {
+                    tolerance = 0;
+                }
+
+                Eigen::Vector3d angles, forward, right, up;
+                angles[0] = 0;
+                angles[1] = atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI);
+                angles[2] = 0;
+                AngleVectors(angles, forward, right, up);
+            
+                sf::String text = "Once we have isolated our intended movement direction\nWe can do the same and isolate the direction we are looking\nby using two vectors associated with the players viewangles-\ncalled the players view vectors.";
+                sf::String text2 = "For this discussion, we will only be focused on the\nhorizontal plane. So, in 2 dimensions the view vectors are:\n\nUnit Forward Vector = <cos(yaw), sin(yaw)>\nUnit Sideways Vector = <sin(yaw), -cos(yaw)>";
+
+                sf::String forwardTxt = "forward.x = " + std::to_string(forward[0]) + "\nforward.y = " + std::to_string(forward[1]);
+                sf::String rightTxt = "right.x = " + std::to_string(right[0]) + "\nright.y = " + std::to_string(right[1]);
+
+                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 600), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 300, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
+
+                DrawUtil::DrawRect(window, 0, 700, sf::Vector2f(950, 170), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 720, font, forwardTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 500, 720, font, rightTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
+            }
+            else if (mode == MODE_WISHVEL_EYEANGLES)
+            {
+                RUN_ONCE
+                {
+                    tolerance = 0;
+                }
+                int fwdmv = 0, sidemv = 0;
+                if (WASD[0]) fwdmv += sv_walkspeed;
+                if (WASD[1]) fwdmv -= sv_walkspeed;
+                if (WASD[2]) sidemv -= sv_walkspeed;
+                if (WASD[3]) sidemv += sv_walkspeed;
+
+                Eigen::Vector3d wishvel;
+                Eigen::Vector3d forward, right, up;
+                Eigen::Vector3d angles = Eigen::Vector3d(0, atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI), 0);
+
+                // Sets forward, right
+                AngleVectors(angles, forward, right, up);
+
+                // Zero out z components of movement vectors
+                forward[2] = 0;
+                right[2] = 0;
+                forward.normalize();
+                right.normalize();
+
+                for (int i = 0; i < 2; i++)
+                {
+                    wishvel[i] = forward[i] * fwdmv + right[i] * sidemv;
+                }
+                wishvel[2] = 0; // Zero out z part of velocity
+
+                double wishspeed = VecMagnitude(wishvel);
+                Eigen::Vector2d ptWishVel = Eigen::Vector2d(wishvel[0] / wishspeed, -wishvel[1] / wishspeed);
+                DrawUtil::DrawLine(window, DrawUtil::center, ptWishVel, sf::Color(122, 235, 52), false, 20.0);
+                DrawUtil::DrawPoint(window, ptWishVel, sf::Color(122, 235, 52), 20.0);
+                DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0);
+
+                sf::String text = "When pressing A, the player is essentially saying\n'I want to move left relative to where i'm looking'";
+                sf::String text2 = "Since we have the intended direction based on keypresses,\nand the view vectors representing where we are looking,\nWe can now multiply these by their components and get the\nresulting vector, which we call the 'Wish velocity' or\nthe 'Acceleration vector'\n\nTry out some keypresses to see the Wish velocity!";
+                sf::String text3 = "wishvel.x = forward.x * forwardmove + right.x * sidemove\nwishvel.y = forward.y * forwardmove + right.y * sidemove";
+                sf::String wishvelXText = "wishvel.x = " + std::to_string(forward[0]) + " * " + std::to_string(fwdmv) + " + " + std::to_string(right[0]) + " * " + std::to_string(sidemv) + " = " + std::to_string(wishvel[0]);
+                sf::String wishvelYText = "wishvel.y = " + std::to_string(forward[1]) + " * " + std::to_string(fwdmv) + " + " + std::to_string(right[1]) + " * " + std::to_string(sidemv) + " = " + std::to_string(wishvel[1]);
+
+                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 550), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 150, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
+
+                DrawUtil::DrawRect(window, 0, 600, sf::Vector2f(950, 300), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 620, font, text3, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 750, font, wishvelXText, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 20, 800, font, wishvelYText, 40, sf::Color(255, 255, 255, 255 * tolerance));
             }
         }
     }
@@ -243,3 +314,40 @@ bool Animations::ShowVectors(sf::RenderTarget& window)
     return UpdateMode(mode);
 }
 
+bool Animations::PerfAngleDemo(sf::RenderTarget& window)
+{
+    RUN_ONCE
+    {
+      unfilteredPts[0] = Eigen::Vector2d(1, 0);
+      unfilteredPts[1] = Eigen::Vector2d(1, 0);
+    }
+
+    enum Mode
+    {
+        MODE_VELOCITY,
+        MODE_END
+    };
+
+    static Mode mode = MODE_VELOCITY;
+    static double tolerance = 0;
+
+    // Get points
+    const Eigen::Vector2d& ptVelocity = moveablePts[0];
+    const Eigen::Vector2d& ptYaw = moveablePts[1];
+
+    Animations::vecVelocity[0] = Animations::moveablePts[0][0] * DrawUtil::scale;
+    Animations::vecVelocity[1] = -Animations::moveablePts[0][1] * DrawUtil::scale; //flip y axis sign
+
+    // Make unit vector
+    Animations::vecYaw[0] = Animations::moveablePts[1][0] / VecMagnitude(moveablePts[1]);
+    Animations::vecYaw[1] = -Animations::moveablePts[1][1] / VecMagnitude(moveablePts[1]);
+
+    sf::Font font;
+    if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
+    {
+        if (mode == MODE_VELOCITY)
+        {
+
+        }
+    }
+}

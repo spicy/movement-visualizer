@@ -16,9 +16,11 @@
 int cur_anim = -1;
 const double pt_smoothing = 0.7;
 
+//pointer to func array
 static bool(*ANIM_ARRAY[])(sf::RenderTarget& window) =
 {
-  Animations::ShowVectors
+  Animations::WishVelDemonstration,
+  Animations::PerfAngle
 };
 
 static const int NUM_ANIMS = sizeof(ANIM_ARRAY) / sizeof(ANIM_ARRAY[0]);

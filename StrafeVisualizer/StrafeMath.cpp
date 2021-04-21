@@ -17,8 +17,14 @@ inline void VectorScale(const Eigen::Vector3d& in, float scale, Eigen::Vector3d&
 }
 
 
+void StrafeMath::UpdateNecessaryStuff()
+{
+
+}
+
 void StrafeMath::ProcessMovement()
 {
+	UpdateNecessaryStuff();
 	PlayerMove();
 	FinishMove();
 }
@@ -370,7 +376,7 @@ void StrafeMath::FinishGravity()
 
 
 //Other
-void StrafeMath::AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward, Eigen::Vector3d& right, Eigen::Vector3d& up)
+void AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward, Eigen::Vector3d& right, Eigen::Vector3d& up)
 {
     float angle;
     static float sinpitch, sinyaw, sinroll, cospitch, cosyaw, cosroll;
@@ -396,12 +402,12 @@ void StrafeMath::AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward,
     up[2] = cosroll * cospitch;
 }
 
-double StrafeMath::VecMagnitude(Eigen::Vector3d& vec)
+double VecMagnitude(Eigen::Vector3d& vec)
 {
 	return std::sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
 }
 
-double StrafeMath::DotProduct(Eigen::Vector3d& a, Eigen::Vector3d& b)
+double DotProduct(Eigen::Vector3d& a, Eigen::Vector3d& b)
 {
 	return (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
 }

@@ -13,7 +13,7 @@ float DrawUtil::render_scale = 2.0f;
 /// <summary>
 /// 
 /// </summary>
-static sf::Vector2f ToSF(const Eigen::Vector2d& v) 
+sf::Vector2f DrawUtil::ToSF(const Eigen::Vector2d& v)
 {
     return sf::Vector2f((float)v.x(), (float)v.y());
 }
@@ -22,7 +22,7 @@ static sf::Vector2f ToSF(const Eigen::Vector2d& v)
 /// <summary>
 /// 
 /// </summary>
-static Eigen::Vector2d HalfSize(const sf::RenderTarget& window) 
+Eigen::Vector2d DrawUtil::HalfSize(const sf::RenderTarget& window)
 {
     return Eigen::Vector2d((double)window.getSize().x, (double)window.getSize().y) * 0.5;
 }
@@ -134,19 +134,19 @@ void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
     const int max_x = int(center.x() + 0.5 * double(window.getSize().x) / scale) + 1;
     const int min_y = int(center.y() - 0.5 * double(window.getSize().y) / scale) - 1;
     const int max_y = int(center.y() + 0.5 * double(window.getSize().y) / scale) + 1;
-    window.clear(sf::Color(29, 122, 125));
+    window.clear(sf::Color(75, 131, 156));
 
     for (int x = min_x; x < max_x; ++x)
     {
-        for (int i = 0; i < 4; ++i) 
+        for (int i = 0; i < 3; ++i) 
         {
             const double q = 0.25 * double((x - min_x)*4 + i) / double(max_x - min_x);
             const double bounce = SmoothBounce(tolerance, q*0.5 + 0.5, 20.0);
 
             if (bounce <= 0.0) { continue; }
 
-            const Eigen::Vector2d a((double)x + i*0.25, (double)min_y);
-            const Eigen::Vector2d b((double)x + i*0.25, (double)max_y);
+            const Eigen::Vector2d a((double)x + i*0.33, (double)min_y);
+            const Eigen::Vector2d b((double)x + i*0.33, (double)max_y);
 
             if (i == 0)
             {
@@ -161,14 +161,14 @@ void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 
     for (int y = min_y; y < max_y; ++y) 
     {
-        for (int i = 0; i < 4; ++i) 
+        for (int i = 0; i < 3; ++i) 
         {
-            const double q = 0.25 * double((y - min_y) * 4 + i) / double(max_y - min_y);
+            const double q = 0.33 * double((y - min_y) * 4 + i) / double(max_y - min_y);
             const double bounce = SmoothBounce(tolerance, q * 0.5, 20.0);
 
             if (bounce <= 0.0) { continue; }
-            const Eigen::Vector2d a((double)min_x, (double)y + i * 0.25);
-            const Eigen::Vector2d b((double)max_x, (double)y + i * 0.25);
+            const Eigen::Vector2d a((double)min_x, (double)y + i * 0.33);
+            const Eigen::Vector2d b((double)max_x, (double)y + i * 0.33);
             if (i == 0)
             {
                 DrawLine(window, a, b, sf::Color::White, false, 2.0*bounce);

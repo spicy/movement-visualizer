@@ -45,7 +45,6 @@ static bool UpdateTolerance(double& tolerance, double tolerance_in, double toler
     return false;
 }
 
-
 template<typename T>
 static bool UpdateMode(T& mode) 
 {
@@ -54,7 +53,7 @@ static bool UpdateMode(T& mode)
         mode = T(mode + 1);
         if (mode == T::MODE_END) 
         {
-            return true;
+             return true;
         } 
         else 
         {
@@ -63,7 +62,6 @@ static bool UpdateMode(T& mode)
     } 
     return false;
 }
-
 
 inline double VecMagnitude(Eigen::Vector2d& vec)
 {
@@ -103,14 +101,14 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
     };
 
     static Mode mode = MODE_POINTS;
-    static double tolerance = 0;
     sf::Vector2u screenDimensions = window.getSize();
+
+    static double tolerance = 0;
+    double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.4, 50.0) : 1.0;
 
     // Get points
     const Eigen::Vector2d& ptVelocity = moveablePts[0];
     const Eigen::Vector2d& ptYaw = moveablePts[1];
-
-    double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.4, 50.0) : 1.0;
 
     Animations::vecVelocity[0] = Animations::moveablePts[0][0] * DrawUtil::scale;
     Animations::vecVelocity[1] = -Animations::moveablePts[0][1] * DrawUtil::scale; //flip y axis sign
@@ -137,7 +135,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
             DrawUtil::DrawPoint(window, ptVelocity, sf::Color(14, 60, 158), 20.0);
 
             sf::String text = "Choose some x,y position by\ninteracting with the points";
-            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 250, 0, sf::Vector2f(500, 150), sf::Color(61, 61, 60, 240 * tolerance));
+            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 250, 0, sf::Vector2f(500, 150), sf::Color(41, 41, 40, 240 * tolerance));
             DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 250 + 40, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
         }
         else if (mode == MODE_ARROWS)
@@ -151,7 +149,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
             DrawUtil::DrawPoint(window, ptVelocity, sf::Color(14, 60, 158), 20.0);
 
             sf::String text = "The blue dot will represent our players velocity vector\nVectors have both direction and length.";
-            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 420, 0, sf::Vector2f(840, 150), sf::Color(61, 61, 60, 240));
+            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 420, 0, sf::Vector2f(840, 150), sf::Color(41, 41, 40, 240));
             DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 420 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
         }
         else if (mode == MODE_TEXT2)
@@ -168,7 +166,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
             sf::String velxy = "velx: " + std::to_string(vecVelocity[0])
                 + "\nvely: " + std::to_string(vecVelocity[1])
                 + "\nspeed: " + std::to_string(speed);
-            DrawUtil::DrawRect(window, 100 + ptVelocity[0], 100 + ptVelocity[1], sf::Vector2f(500, 300), sf::Color(61, 61, 60, 230 * tolerance));
+            DrawUtil::DrawRect(window, 100 + ptVelocity[0], 100 + ptVelocity[1], sf::Vector2f(500, 300), sf::Color(41, 41, 40, 230 * tolerance));
             DrawUtil::DrawTextSF(window, 130 + ptVelocity[0], 130 + ptVelocity[1], font, velxy, 60, sf::Color(255, 255, 255, 255 * tolerance + 0.5));
         }
         else if (mode == MODE_VIEWANGLES)
@@ -183,7 +181,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
             DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0 * bounce);
 
             sf::String text = "This vector will represent the direction we are looking towards.\n Its length does not matter since we will only use its direction";
-            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 500, 0, sf::Vector2f(1000, 150), sf::Color(61, 61, 60, 240));
+            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 500, 0, sf::Vector2f(1000, 150), sf::Color(41, 41, 40, 240));
             DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 500 + 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
 
             const int boxX = 70;
@@ -194,7 +192,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
             sf::String yval = "y:" + std::to_string(vecYaw[1]);
             sf::String theta = std::to_string(atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI)) + "°";
 
-            DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(720, 330), sf::Color(61, 61, 60, 230));
+            DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(720, 330), sf::Color(41, 41, 40, 230));
 
             DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 30 + ptYaw[1], font, text2, 40, sf::Color(255, 255, 255));
             DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 100 + ptYaw[1], font, text3, 60, sf::Color(255, 255, 255));
@@ -224,7 +222,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 sf::String text = "We can create two variables that handle the value\nof our forward and sideways movement speed.";
                 sf::String text2 = "This is so we can isolate our intended direction\n(ie. LEFT, FORWARD-RIGHT) to its components\nfor math later.\n\n";
                 sf::String text3 = "Test out some keypresses with WASD!\nForwardmove: " + std::to_string(fwdmv) + "\nSidemove: " + std::to_string(sidemv);
-                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(800, 550), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(800, 550), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 150, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 350, font, text3, 40, sf::Color(255, 255, 255, 255 * tolerance));
@@ -248,11 +246,11 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 sf::String forwardTxt = "forward.x = " + std::to_string(forward[0]) + "\nforward.y = " + std::to_string(forward[1]);
                 sf::String rightTxt = "right.x = " + std::to_string(right[0]) + "\nright.y = " + std::to_string(right[1]);
 
-                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 600), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 600), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 300, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
 
-                DrawUtil::DrawRect(window, 0, 700, sf::Vector2f(950, 170), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawRect(window, 0, 700, sf::Vector2f(950, 170), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 720, font, forwardTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 500, 720, font, rightTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
             }
@@ -289,6 +287,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 
                 double wishspeed = VecMagnitude(wishvel);
                 Eigen::Vector2d ptWishVel = Eigen::Vector2d(wishvel[0] / wishspeed, -wishvel[1] / wishspeed);
+
                 DrawUtil::DrawLine(window, DrawUtil::center, ptWishVel, sf::Color(122, 235, 52), false, 20.0);
                 DrawUtil::DrawPoint(window, ptWishVel, sf::Color(122, 235, 52), 20.0);
                 DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color(255, 255, 255), 20.0);
@@ -299,11 +298,11 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 sf::String wishvelXText = "wishvel.x = " + std::to_string(forward[0]) + " * " + std::to_string(fwdmv) + " + " + std::to_string(right[0]) + " * " + std::to_string(sidemv) + " = " + std::to_string(wishvel[0]);
                 sf::String wishvelYText = "wishvel.y = " + std::to_string(forward[1]) + " * " + std::to_string(fwdmv) + " + " + std::to_string(right[1]) + " * " + std::to_string(sidemv) + " = " + std::to_string(wishvel[1]);
 
-                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 550), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 550), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 150, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
 
-                DrawUtil::DrawRect(window, 0, 600, sf::Vector2f(950, 300), sf::Color(61, 61, 60, 240 * tolerance));
+                DrawUtil::DrawRect(window, 0, 600, sf::Vector2f(950, 300), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 620, font, text3, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 750, font, wishvelXText, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 800, font, wishvelYText, 40, sf::Color(255, 255, 255, 255 * tolerance));
@@ -324,16 +323,24 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
 
     enum Mode
     {
+        MODE_TRIANGLE,
         MODE_VELOCITY,
+        MODE_WISHVEL,
+        MODE_NEXTVEL,
+        MODE_TEXT1,
         MODE_END
     };
 
-    static Mode mode = MODE_VELOCITY;
+    static Mode mode = MODE_TRIANGLE;
+
     static double tolerance = 0;
+    double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.45, 45.0) : 1.0;
 
     // Get points
     const Eigen::Vector2d& ptVelocity = moveablePts[0];
     const Eigen::Vector2d& ptYaw = moveablePts[1];
+
+    sf::Vector2u screenDimensions = window.getSize();
 
     Animations::vecVelocity[0] = Animations::moveablePts[0][0] * DrawUtil::scale;
     Animations::vecVelocity[1] = -Animations::moveablePts[0][1] * DrawUtil::scale; //flip y axis sign
@@ -345,9 +352,101 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
     sf::Font font;
     if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
     {
-        if (mode == MODE_VELOCITY)
+        if (mode >= MODE_TRIANGLE)
         {
+            static double anim = 0;
+            static double animDelta = 0;
 
+            Eigen::Vector2d left(-7, 0);
+            Eigen::Vector2d ptTriangleSide(left[0] + anim, 0);
+            Eigen::Vector2d ptTriangleTip(left[0] + anim, -1);
+
+            if (mode == MODE_TRIANGLE)
+            {
+                DrawUtil::DrawLine(window, left, ptTriangleSide, sf::Color::White, false, 10.0 * bounce);
+                DrawUtil::DrawLine(window, left, ptTriangleTip, sf::Color::White, false, 10.0 * bounce);
+                DrawUtil::DrawLine(window, ptTriangleSide, ptTriangleTip, sf::Color::White, false, 10.0 * bounce);
+            }
+            else if (mode == MODE_VELOCITY)
+            {
+                RUN_ONCE
+                {
+                    tolerance = 0;
+                    bounce = 0;
+                }
+                DrawUtil::DrawLine(window, left, ptTriangleSide, sf::Color(14, 60, 158), false, 10.0);
+                DrawUtil::DrawLine(window, left, ptTriangleTip, sf::Color::White, false, 10.0);
+                DrawUtil::DrawLine(window, ptTriangleSide, ptTriangleTip, sf::Color::White, false, 10.0);
+
+                DrawUtil::DrawPoint(window, ptTriangleSide, sf::Color(14, 60, 158), 20 * bounce);
+
+                sf::String text = "Velocity";
+                DrawUtil::DrawRect(window, 100, 800, sf::Vector2f(400, 200), sf::Color(41, 41, 40, 240 * tolerance));
+                DrawUtil::DrawTextSF(window, 120, 820, font, text, 40, sf::Color(65, 111, 196, 255 * tolerance));
+            }
+            else if (mode == MODE_WISHVEL)
+            {
+                RUN_ONCE
+                {
+                    tolerance = 0;
+                    bounce = 0;
+                }
+                DrawUtil::DrawLine(window, left, ptTriangleSide, sf::Color(14, 60, 158), false, 10.0);
+                DrawUtil::DrawLine(window, left, ptTriangleTip, sf::Color::White, false, 10.0);
+                DrawUtil::DrawLine(window, ptTriangleSide, ptTriangleTip, sf::Color(122, 235, 52), false, 10.0);
+
+                DrawUtil::DrawPoint(window, ptTriangleSide, sf::Color(14, 60, 158), 20);
+                DrawUtil::DrawPoint(window, ptTriangleTip, sf::Color(122, 235, 52), 20 * bounce);
+
+                sf::String text = "Velocity";
+                sf::String text2 = "Wishvel";
+                DrawUtil::DrawRect(window, 100, 800, sf::Vector2f(400, 200), sf::Color(41, 41, 40, 240));
+                DrawUtil::DrawTextSF(window, 120, 820, font, text, 40, sf::Color(65, 111, 196));
+                DrawUtil::DrawTextSF(window, 120, 870, font, text2, 40, sf::Color(122, 235, 52, 255 * tolerance));
+            }
+            else if (mode == MODE_NEXTVEL || mode == MODE_TEXT1)
+            {
+                RUN_ONCE
+                {
+                    tolerance = 0;
+                    bounce = 0;
+                }
+                DrawUtil::DrawLine(window, left, ptTriangleSide, sf::Color(14, 60, 158), false, 10.0);
+                DrawUtil::DrawLine(window, left, ptTriangleTip, sf::Color(245, 197, 103), false, 10.0);
+                DrawUtil::DrawLine(window, ptTriangleSide, ptTriangleTip, sf::Color(122, 235, 52), false, 10.0);
+
+                DrawUtil::DrawPoint(window, ptTriangleSide, sf::Color(14, 60, 158), 20);
+                DrawUtil::DrawPoint(window, ptTriangleTip, sf::Color(122, 235, 52), 20);
+
+                sf::String text = "Velocity";
+                sf::String text2 = "Wishvel";
+                sf::String text3 = "Next Velocity";
+                DrawUtil::DrawRect(window, 100, 800, sf::Vector2f(400, 200), sf::Color(41, 41, 40, 240));
+                DrawUtil::DrawTextSF(window, 120, 820, font, text, 40, sf::Color(65, 111, 196));
+                DrawUtil::DrawTextSF(window, 120, 870, font, text2, 40, sf::Color(122, 235, 52));
+                DrawUtil::DrawTextSF(window, 120, 920, font, text3, 40, sf::Color(245, 197, 103, 255 * tolerance));
+
+                if (mode == MODE_TEXT1)
+                {
+                    sf::String text = "Notice how this triangle";
+                    DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 200, 800, sf::Vector2f(400, 150), sf::Color(41, 41, 40, 240 * tolerance));
+                    DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 180, 820, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                }
+            }
+
+            if (anim > fabs(left[0] * 2))
+            {
+                ptTriangleSide[0] = 0;
+                ptTriangleTip[0] = 0;
+                anim = 0;
+                animDelta = 0;
+            }
+
+            anim += animDelta;
+            animDelta += 0.001;
         }
     }
+
+    UpdateTolerance(tolerance, 0.02, 0.04);
+    return UpdateMode(mode);
 }

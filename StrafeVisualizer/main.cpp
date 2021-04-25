@@ -19,8 +19,8 @@ const double pt_smoothing = 0.7;
 //pointer to func array
 static bool(*ANIM_ARRAY[])(sf::RenderTarget& window) =
 {
-  Animations::WishVelDemonstration,
-  Animations::PerfAngle
+  Animations::PerfAngleDemo,
+  Animations::WishVelDemonstration
 };
 
 static const int NUM_ANIMS = sizeof(ANIM_ARRAY) / sizeof(ANIM_ARRAY[0]);
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
         //Draw the foreground
         if (cur_anim > 0 && cur_anim <= NUM_ANIMS && ANIM_ARRAY[cur_anim - 1](renderTexture)) 
         {
-            Animations::animate_out = false;
+           Animations::animate_out = false;
            cur_anim += 1;
         }
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
         //Take a single screen-shot
         if (capture)
         {
-            texture.copyToImage().saveToFile("sshot.png");
+            texture.copyToImage().saveToFile("ss.png");
             capture = false;
         }
 

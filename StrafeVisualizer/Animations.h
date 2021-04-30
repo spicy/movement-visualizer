@@ -9,7 +9,8 @@ public:
 	static Eigen::Vector2d moveablePts[2];
 	static Eigen::Vector2d vecVelocity;
 	static Eigen::Vector2d vecYaw;
-	static Eigen::Vector4i WASD;
+
+	static double fsmove[2];
 
 	static int frame;
 	static bool animate_out;

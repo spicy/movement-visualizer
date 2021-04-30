@@ -128,38 +128,46 @@ int main(int argc, char *argv[]) {
                     capture = true;
                 }
 
+                // Create local vars to handle counter strafing (W+S/A+D)
+                double fwdmv = 0, sidemv = 0;
+
                 switch (keycode)
                 {
                 case sf::Keyboard::W:
-                    Animations::WASD[0] = 1;
+                    fwdmv += sv_walkspeed;
+                    Animations::fsmove[0] = fwdmv;
                     break;
                 case sf::Keyboard::S:
-                    Animations::WASD[1] = 1;
+                    fwdmv -= sv_walkspeed;
+                    Animations::fsmove[0] = fwdmv;
                     break;
                 case sf::Keyboard::A:
-                    Animations::WASD[2] = 1;
+                    sidemv -= sv_walkspeed;
+                    Animations::fsmove[1] = sidemv;
                     break;
                 case sf::Keyboard::D:
-                    Animations::WASD[3] = 1;
+                    sidemv += sv_walkspeed;
+                    Animations::fsmove[1] = sidemv;
                     break;
                 }
             }
             else if (event.type == sf::Event::KeyReleased)
             {
                 sf::Keyboard::Key keycode = event.key.code;
+
                 switch (keycode)
                 {
                 case sf::Keyboard::W:
-                    Animations::WASD[0] = 0;
+                    Animations::fsmove[0] = 0;
                     break;
                 case sf::Keyboard::S:
-                    Animations::WASD[1] = 0;
+                    Animations::fsmove[0] = 0;
                     break;
                 case sf::Keyboard::A:
-                    Animations::WASD[2] = 0;
+                    Animations::fsmove[1] = 0;
                     break;
                 case sf::Keyboard::D:
-                    Animations::WASD[3] = 0;
+                    Animations::fsmove[1] = 0;
                     break;
                 }
             }

@@ -24,7 +24,7 @@ Eigen::Vector2d Animations::vecYaw;                // Unit vector of moveablePts
 
 int Animations::frame = 0;
 bool Animations::animate_out = false;
-Eigen::Vector4i Animations::WASD;
+double Animations::fsmove[2];
 
 BasePlayer*      StrafeMath::player;
 CMoveData*       StrafeMath::mv;
@@ -163,9 +163,10 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 tolerance = 0;
             }
             double speed = std::sqrt(vecVelocity[0] * vecVelocity[0] + vecVelocity[1] * vecVelocity[1]);
-            sf::String velxy = "velx: " + std::to_string(vecVelocity[0])
-                + "\nvely: " + std::to_string(vecVelocity[1])
-                + "\nspeed: " + std::to_string(speed);
+            sf::String velxy = "velx: " + std::to_string(vecVelocity[0]) 
+                            + "\nvely: " + std::to_string(vecVelocity[1])
+                            + "\nspeed: " + std::to_string(speed);
+
             DrawUtil::DrawRect(window, 100 + ptVelocity[0], 100 + ptVelocity[1], sf::Vector2f(500, 300), sf::Color(41, 41, 40, 230 * tolerance));
             DrawUtil::DrawTextSF(window, 130 + ptVelocity[0], 130 + ptVelocity[1], font, velxy, 60, sf::Color(255, 255, 255, 255 * tolerance + 0.5));
         }
@@ -187,12 +188,12 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
             const int boxX = 70;
             const int boxY = 200;
             sf::String text2 = "Lets construct the angle we are looking at";
-            sf::String text3 = "arctangent(                ) (to deg)";
+            sf::String text3 = "arctangent(                 ) (to deg)";
             sf::String xval = "x:" + std::to_string(vecYaw[0]);
             sf::String yval = "y:" + std::to_string(vecYaw[1]);
             sf::String theta = std::to_string(atan2f(vecYaw[1], vecYaw[0]) * (180 / M_PI)) + "°";
 
-            DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(720, 330), sf::Color(41, 41, 40, 230));
+            DrawUtil::DrawRect(window, boxX + ptYaw[0], boxY + ptYaw[1], sf::Vector2f(740, 330), sf::Color(41, 41, 40, 230));
 
             DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 30 + ptYaw[1], font, text2, 40, sf::Color(255, 255, 255));
             DrawUtil::DrawTextSF(window, boxX + 30 + ptYaw[0], boxY + 100 + ptYaw[1], font, text3, 60, sf::Color(255, 255, 255));
@@ -213,15 +214,9 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                     tolerance = 0;
                 }
 
-                int fwdmv = 0, sidemv = 0;
-                if (WASD[0]) fwdmv += sv_walkspeed;
-                if (WASD[1]) fwdmv -= sv_walkspeed;
-                if (WASD[2]) sidemv -= sv_walkspeed;
-                if (WASD[3]) sidemv += sv_walkspeed;
-
                 sf::String text = "We can create two variables that handle the value\nof our forward and sideways movement speed.";
                 sf::String text2 = "This is so we can isolate our intended direction\n(ie. LEFT, FORWARD-RIGHT) to its components\nfor math later.\n\n";
-                sf::String text3 = "Test out some keypresses with WASD!\nForwardmove: " + std::to_string(fwdmv) + "\nSidemove: " + std::to_string(sidemv);
+                sf::String text3 = "Test out some keypresses with WASD!\nForwardmove: " + std::to_string(fsmove[0]) + "\nSidemove: " + std::to_string(fsmove[1]);
                 DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(800, 550), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 150, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
@@ -243,16 +238,16 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 sf::String text = "Once we have isolated our intended movement direction\nWe can do the same and isolate the direction we are looking\nby using two vectors associated with the players viewangles-\ncalled the players view vectors.";
                 sf::String text2 = "For this discussion, we will only be focused on the\nhorizontal plane. So, in 2 dimensions the view vectors are:\n\nUnit Forward Vector = <cos(yaw), sin(yaw)>\nUnit Sideways Vector = <sin(yaw), -cos(yaw)>";
 
-                sf::String forwardTxt = "forward.x = " + std::to_string(forward[0]) + "\nforward.y = " + std::to_string(forward[1]);
-                sf::String rightTxt = "right.x = " + std::to_string(right[0]) + "\nright.y = " + std::to_string(right[1]);
+                sf::String forwardTxt = "forward = (" + std::to_string(forward[0]) + ", " + std::to_string(forward[1]) + ")";
+                sf::String rightTxt = "right = (" + std::to_string(right[0]) + ", " + std::to_string(right[1]) + ")";
 
                 DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 600), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 300, font, text2, 40, sf::Color(255, 255, 255, 255 * tolerance));
 
                 DrawUtil::DrawRect(window, 0, 700, sf::Vector2f(950, 170), sf::Color(41, 41, 40, 240 * tolerance));
-                DrawUtil::DrawTextSF(window, 20, 720, font, forwardTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, 500, 720, font, rightTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 120, 720, font, forwardTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 120, 780, font, rightTxt, 50, sf::Color(255, 255, 255, 255 * tolerance));
             }
             else if (mode == MODE_WISHVEL_EYEANGLES)
             {
@@ -260,11 +255,6 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 {
                     tolerance = 0;
                 }
-                int fwdmv = 0, sidemv = 0;
-                if (WASD[0]) fwdmv += sv_walkspeed;
-                if (WASD[1]) fwdmv -= sv_walkspeed;
-                if (WASD[2]) sidemv -= sv_walkspeed;
-                if (WASD[3]) sidemv += sv_walkspeed;
 
                 Eigen::Vector3d wishvel;
                 Eigen::Vector3d forward, right, up;
@@ -281,7 +271,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 
                 for (int i = 0; i < 2; i++)
                 {
-                    wishvel[i] = forward[i] * fwdmv + right[i] * sidemv;
+                    wishvel[i] = forward[i] * fsmove[0] + right[i] * fsmove[1];
                 }
                 wishvel[2] = 0; // Zero out z part of velocity
 
@@ -295,8 +285,8 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 sf::String text = "When pressing A, the player is essentially saying\n'I want to move left relative to where i'm looking'";
                 sf::String text2 = "Since we have the intended direction based on keypresses,\nand the view vectors representing where we are looking,\nWe can now multiply these by their components and get the\nresulting vector, which we call the 'Wish velocity' or\nthe 'Acceleration vector'\n\nTry out some keypresses to see the Wish velocity!";
                 sf::String text3 = "wishvel.x = forward.x * forwardmove + right.x * sidemove\nwishvel.y = forward.y * forwardmove + right.y * sidemove";
-                sf::String wishvelXText = "wishvel.x = " + std::to_string(forward[0]) + " * " + std::to_string(fwdmv) + " + " + std::to_string(right[0]) + " * " + std::to_string(sidemv) + " = " + std::to_string(wishvel[0]);
-                sf::String wishvelYText = "wishvel.y = " + std::to_string(forward[1]) + " * " + std::to_string(fwdmv) + " + " + std::to_string(right[1]) + " * " + std::to_string(sidemv) + " = " + std::to_string(wishvel[1]);
+                sf::String wishvelXText = "wishvel.x = " + std::to_string(forward[0]) + " * " + std::to_string(fsmove[0]) + " + " + std::to_string(right[0]) + " * " + std::to_string(fsmove[1]) + " = " + std::to_string(wishvel[0]);
+                sf::String wishvelYText = "wishvel.y = " + std::to_string(forward[1]) + " * " + std::to_string(fsmove[0]) + " + " + std::to_string(right[1]) + " * " + std::to_string(fsmove[1]) + " = " + std::to_string(wishvel[1]);
 
                 DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(950, 550), sf::Color(41, 41, 40, 240 * tolerance));
                 DrawUtil::DrawTextSF(window, 20, 20, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
@@ -323,15 +313,16 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
 
     enum Mode
     {
+        MODE_TEXT1,
         MODE_TRIANGLE,
         MODE_VELOCITY,
         MODE_WISHVEL,
         MODE_NEXTVEL,
-        MODE_TEXT1,
+        MODE_TEXT2,
         MODE_END
     };
 
-    static Mode mode = MODE_TRIANGLE;
+    static Mode mode = MODE_TEXT1;
 
     static double tolerance = 0;
     double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.45, 45.0) : 1.0;
@@ -361,11 +352,18 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
             Eigen::Vector2d ptTriangleSide(left[0] + anim, 0);
             Eigen::Vector2d ptTriangleTip(left[0] + anim, -1);
 
-            if (mode == MODE_TRIANGLE)
+            if (mode == MODE_TRIANGLE || mode == MODE_TEXT1)
             {
                 DrawUtil::DrawLine(window, left, ptTriangleSide, sf::Color::White, false, 10.0 * bounce);
                 DrawUtil::DrawLine(window, left, ptTriangleTip, sf::Color::White, false, 10.0 * bounce);
                 DrawUtil::DrawLine(window, ptTriangleSide, ptTriangleTip, sf::Color::White, false, 10.0 * bounce);
+
+                if (mode == MODE_TEXT1)
+                {
+                    sf::String text = "This triangle will show why high velocities require 'slower' mouse movements\n";
+                    DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 200, 800, sf::Vector2f(400, 150), sf::Color(41, 41, 40, 240 * tolerance));
+                    DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 180, 820, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                }
             }
             else if (mode == MODE_VELOCITY)
             {
@@ -426,7 +424,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
                 DrawUtil::DrawTextSF(window, 120, 870, font, text2, 40, sf::Color(122, 235, 52));
                 DrawUtil::DrawTextSF(window, 120, 920, font, text3, 40, sf::Color(245, 197, 103, 255 * tolerance));
 
-                if (mode == MODE_TEXT1)
+                if (mode == MODE_TEXT2)
                 {
                     sf::String text = "Notice how this triangle";
                     DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 200, 800, sf::Vector2f(400, 150), sf::Color(41, 41, 40, 240 * tolerance));

@@ -16,9 +16,10 @@
 int cur_anim = -1;
 const double pt_smoothing = 0.7;
 
-//pointer to func array
-static bool(*ANIM_ARRAY[])(sf::RenderTarget& window) =
-{
+
+typedef bool (*sfFuncPtr)(sf::RenderTarget& window);
+static sfFuncPtr ANIM_ARRAY[] =
+{ 
   Animations::PerfAngleDemo,
   Animations::WishVelDemonstration
 };

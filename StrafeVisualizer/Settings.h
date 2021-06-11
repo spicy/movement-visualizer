@@ -9,6 +9,6 @@ struct
 		const int start_w = 1280;
 		const int start_h = 720;
 		const bool start_fullscreen = false;
-		const int render_scale = 2;
+		const int render_scale = 1;
 	}video;
 }settings;

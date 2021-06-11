@@ -343,7 +343,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
     sf::Font font;
     if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
     {
-        if (mode >= MODE_TRIANGLE)
+        if (mode >= MODE_TEXT1)
         {
             static double anim = 0;
             static double animDelta = 0;
@@ -361,8 +361,8 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
                 if (mode == MODE_TEXT1)
                 {
                     sf::String text = "This triangle will show why high velocities require 'slower' mouse movements\n";
-                    DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 200, 800, sf::Vector2f(400, 150), sf::Color(41, 41, 40, 240 * tolerance));
-                    DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 180, 820, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
+                    DrawUtil::DrawRect(window, 200, 200, sf::Vector2f(400, 150), sf::Color(41, 41, 40, 240));
+                    DrawUtil::DrawTextSF(window, 180, 220, font, text, 40, sf::Color(255, 255, 255, 255));
                 }
             }
             else if (mode == MODE_VELOCITY)

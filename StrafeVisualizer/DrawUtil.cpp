@@ -121,6 +121,7 @@ void DrawUtil::DrawTextSF(sf::RenderTarget& window, const float x, const float y
     text.setFillColor(color);
     text.setStyle(sf::Text::Style::Regular);
     text.setPosition(x, y);
+
     // inside the main loop, between window.clear() and window.display()
     window.draw(text);
 }

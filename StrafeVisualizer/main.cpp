@@ -16,7 +16,6 @@
 int cur_anim = -1;
 const double pt_smoothing = 0.7;
 
-
 typedef bool (*sfFuncPtr)(sf::RenderTarget& window);
 static sfFuncPtr ANIM_ARRAY[] =
 { 
@@ -94,7 +93,6 @@ int main(int argc, char *argv[]) {
     }
 
     //Main Loop
-    bool capture = false;
     while (window.isOpen()) 
     {
         sf::Event event;
@@ -123,10 +121,6 @@ int main(int argc, char *argv[]) {
                     {
                         cur_anim += 1;
                     }
-                }
-                else if (keycode == sf::Keyboard::C)
-                {
-                    capture = true;
                 }
 
                 // Create local vars to handle counter strafing (W+S/A+D)
@@ -231,13 +225,6 @@ int main(int argc, char *argv[]) {
         sf::Sprite sprite(texture);
         sprite.setScale(1.0f / float(settings.video.render_scale), 1.0f / float(settings.video.render_scale));
         window.draw(sprite);
-
-        //Take a single screen-shot
-        if (capture)
-        {
-            texture.copyToImage().saveToFile("ss.png");
-            capture = false;
-        }
 
         //Flip the screen buffer
         window.display();

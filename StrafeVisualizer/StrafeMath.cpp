@@ -123,8 +123,6 @@ void StrafeMath::WalkMove()
 	// Clamp to server defined max speed
 	if ((wishspeed != 0.0f) && (wishspeed > mv->m_flMaxSpeed))
 	{
-
-
 		VectorScale(wishvel, mv->m_flMaxSpeed / wishspeed, wishvel);
 		wishspeed = mv->m_flMaxSpeed;
 	}
@@ -176,7 +174,6 @@ void StrafeMath::Accelerate(Eigen::Vector3d& wishdir, float wishspeed, float acc
 	{
 		mv->m_vecVelocity[i] += accelspeed * wishdir[i];
 	}
-
 }
 
 void StrafeMath::Friction()

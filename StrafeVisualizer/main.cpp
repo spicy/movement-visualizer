@@ -19,7 +19,7 @@ const double pt_smoothing = 0.7;
 typedef bool (*sfFuncPtr)(sf::RenderTarget& window);
 static sfFuncPtr ANIM_ARRAY[] =
 { 
-  Animations::PerfAngleDemo,
+  //Animations::PerfAngleDemo,
   Animations::WishVelDemonstration
 };
 
@@ -27,17 +27,17 @@ static const int NUM_ANIMS = sizeof(ANIM_ARRAY) / sizeof(ANIM_ARRAY[0]);
 
 static void ActivatePoint(const sf::RenderTarget& window) 
 {
-  const Eigen::Vector2d p = DrawUtil::FromPix(window, mouse.pos * settings.video.render_scale);
-  for (int i = 0; i < 2; ++i) 
-  {
-    const double d = (Animations::moveablePts[i] - p).norm();
-    if (d * DrawUtil::scale < 10.0 * settings.video.render_scale)
+    const Eigen::Vector2d p = DrawUtil::FromPix(window, mouse.pos * settings.video.render_scale);
+    for (int i = 0; i < 2; ++i) 
     {
-      mouse.select = i;
-      return;
+        const double diff = (Animations::moveablePts[i] - p).norm();
+        if (diff * DrawUtil::scale < 10.0 * settings.video.render_scale)
+        {
+            mouse.select = i;
+            return;
+        }
     }
-  }
-  mouse.select = -1;
+    mouse.select = -1;
 }
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
@@ -231,5 +231,5 @@ int main(int argc, char *argv[]) {
         Animations::frame += 1;
     }
 
-  return 0;
+    return 0;
 }

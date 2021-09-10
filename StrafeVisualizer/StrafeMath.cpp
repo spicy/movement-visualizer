@@ -1,8 +1,10 @@
 #include "StrafeMath.h"
 
-#ifndef M_PI 
-#define M_PI 3.1415926535 
+#ifndef PI 
+#define PI 3.1415926535 
 #endif
+
+Player* StrafeMath::player;
 
 inline void VectorMultiply(const Eigen::Vector3d& a, float b, Eigen::Vector3d& c)
 {
@@ -17,24 +19,36 @@ inline void VectorScale(const Eigen::Vector3d& in, float scale, Eigen::Vector3d&
 }
 
 
-void StrafeMath::UpdateNecessaryStuff()
+void StrafeMath::ManuallyUpdateStuff()
 {
+	Eigen::Vector3d angles = Eigen::Vector3d(0, atan2f(player->viewAngles[1], player->viewAngles[0]) * (180 / PI), 0);
 
+	// Sets forward, right
+	AngleVectors(angles, player->forward, player->right, player->up);
+
+	// Zero out z components of movement vectors
+	player->forward[2] = 0;
+	player->right[2] = 0;
+	player->forward.normalize();
+	player->right.normalize();
+
+	// Set wishvel
+	for (int i = 0; i < 2; i++)
+	{
+		player->wishVel[i] = player->forward[i] * player->forwardMove + player->right[i] * player->sideMove;
+	}
+	player->wishVel[2] = 0; // Zero out z part of velocity
 }
 
 void StrafeMath::ProcessMovement()
 {
-	UpdateNecessaryStuff();
 	PlayerMove();
 	FinishMove();
 }
 
 void StrafeMath::PlayerMove()
 {
-	//capture keypresses
-	CaptureMovementKeys();
-    //start some movement
-    switch (positionType)
+    switch (player->positionType)
     {
     case GROUND:
         WalkMove();
@@ -47,20 +61,18 @@ void StrafeMath::PlayerMove()
 
 void StrafeMath::FinishMove()
 {
-	mv->m_nOldButtons = mv->m_nButtons;
+	player->oldButtons = player->buttons;
 }
 
 
 //General movement wrapping function
 void StrafeMath::FullWalkMove()
 {
-	StartGravity();
-
 	// Fricion is handled before we add in any base velocity.
-	switch (positionType)
+	switch (player->positionType)
 	{
 	case GROUND:
-		player->m_vecVelocity[2] = 0;
+		player->velocity[2] = 0;
 		Friction();
 		CheckVelocity();
 		WalkMove();
@@ -74,12 +86,10 @@ void StrafeMath::FullWalkMove()
 	// Make sure velocity is valid
 	CheckVelocity();
 
-	FinishGravity();
-
 	// If we are on ground, no downward velocity.
-	if (positionType == GROUND)
+	if (player->positionType == GROUND)
 	{
-		player->m_vecVelocity[2] = 0;
+		player->velocity[2] = 0;
 	}
 	//CheckLanding();
 }
@@ -88,72 +98,70 @@ void StrafeMath::FullWalkMove()
 //Ground movement
 void StrafeMath::WalkMove()
 {
-	Eigen::Vector3d wishvel, wishdir;
+	Eigen::Vector3d wishdir;
 	float wishspeed;
 	float spd;
 
-	Eigen::Vector3d dest;
-
 	// Determine movement angles
-	AngleVectors(mv->m_vecViewAngles, player->m_vecForward, player->m_vecRight, player->m_vecUp);
+	Eigen::Vector3d angles = Eigen::Vector3d(0, atan2f(player->viewAngles[1], player->viewAngles[0]) * (180 / PI), 0);
+	AngleVectors(angles, player->forward, player->right, player->up);
 
 	// Copy movement amounts
 
 	// Zero out z components of eye vectors
-	player->m_vecForward[2] = 0;
-	player->m_vecRight[2] = 0;
-	player->m_vecForward.normalize();
-	player->m_vecRight.normalize();
+	player->forward[2] = 0;
+	player->right[2] = 0;
+	player->forward.normalize();
+	player->right.normalize();
 
 	// Determine x and y parts of velocity
 	for (int i = 0; i < 2; i++)
 	{
-		wishvel[i] = player->m_vecForward[i] * mv->m_flForwardMove + player->m_vecRight[i] * mv->m_flSideMove;
+		player->wishVel[i] = player->forward[i] * player->forwardMove + player->right[i] * player->sideMove;
 	}
 
 	// Zero out z part of velocity
-	wishvel[2] = 0; 
+	player->wishVel[2] = 0;
 
 	// Isolate direction component of velocity
-	wishdir = wishvel;
+	wishdir = player->wishVel;
 	wishdir.normalize();
 
 	// Isolate magnitude component of velocity
-	wishspeed = VecMagnitude(wishvel);
+	wishspeed = VecMagnitude(player->wishVel);
 	// Clamp to server defined max speed
-	if ((wishspeed != 0.0f) && (wishspeed > mv->m_flMaxSpeed))
+	if ((wishspeed != 0.0f) && (wishspeed > player->maxSpeed))
 	{
-		VectorScale(wishvel, mv->m_flMaxSpeed / wishspeed, wishvel);
-		wishspeed = mv->m_flMaxSpeed;
+		VectorScale(player->wishVel, player->maxSpeed / wishspeed, player->wishVel);
+		wishspeed = player->maxSpeed;
 	}
 
 	// Set pmove velocity
-	mv->m_vecVelocity[2] = 0;
+	player->velocity[2] = 0;
 	Accelerate(wishdir, wishspeed, sv_accelerate);
-	mv->m_vecVelocity[2] = 0;
+	player->velocity[2] = 0;
 
-	spd = VecMagnitude(player->m_vecVelocity);
+	spd = VecMagnitude(player->velocity);
 
 	// first try just moving to the destination	
-	dest[0] = mv->m_vecAbsOrigin[0] + mv->m_vecVelocity[0] * intervalPerTick;
-	dest[1] = mv->m_vecAbsOrigin[1] + mv->m_vecVelocity[1] * intervalPerTick;
-	dest[2] = mv->m_vecAbsOrigin[2];
+	//dest[0] = player->vecAbsOrigin[0] + player->velocity[0] * intervalPerTick;
+	//dest[1] = player->vecAbsOrigin[1] + player->velocity[1] * intervalPerTick;
+	//dest[2] = player->vecAbsOrigin[2];
 
 	// first try moving directly to the next spot
-	//TracePlayerBBox(mv->GetAbsOrigin(), dest, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm);
+	//TracePlayerBBox(player->GetAbsOrigin(), dest, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm);
 
 	// If we made it all the way, then copy trace end as new player position.
-	mv->m_outWishVel += wishdir * wishspeed;
+	player->outWishVel += wishdir * wishspeed;
 }
 
 void StrafeMath::Accelerate(Eigen::Vector3d& wishdir, float wishspeed, float accel)
 {
-	int i;
 	float addspeed, accelspeed, currentspeed;
 
 	// See if we are changing direction a bit
 
-	currentspeed = DotProduct(mv->m_vecVelocity, wishdir);
+	currentspeed = DotProduct(player->velocity, wishdir);
 
 	// Reduce wishspeed by the amount of veer.
 	addspeed = wishspeed - currentspeed;
@@ -163,16 +171,16 @@ void StrafeMath::Accelerate(Eigen::Vector3d& wishdir, float wishspeed, float acc
 		return;
 
 	// Determine amount of accleration.
-	accelspeed = accel * intervalPerTick * wishspeed * player->m_surfaceFriction;
+	accelspeed = accel * intervalPerTick * wishspeed * player->surfaceFriction;
 
 	// Cap at addspeed
 	if (accelspeed > addspeed)
 		accelspeed = addspeed;
 
 	// Adjust velocity.
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		mv->m_vecVelocity[i] += accelspeed * wishdir[i];
+		player->velocity[i] += accelspeed * wishdir[i];
 	}
 }
 
@@ -183,7 +191,7 @@ void StrafeMath::Friction()
 	float drop;
 
 	// speed is magnitude of player velocity
-	speed = VecMagnitude(player->m_vecVelocity);
+	speed = VecMagnitude(player->velocity);
 	// If too slow, return
 	if (speed < 0.1f)
 	{
@@ -192,9 +200,9 @@ void StrafeMath::Friction()
 
 	drop = 0;
 	// apply ground friction
-	if (positionType == GROUND)  // On an entity that is the ground
+	if (player->positionType == GROUND)  // On an entity that is the ground
 	{
-		friction = sv_friction * player->m_surfaceFriction;
+		friction = sv_friction * player->surfaceFriction;
 
 		// Bleed off some speed, but if we have less than the bleed
 		// threshold, bleed the threshold amount.
@@ -217,49 +225,44 @@ void StrafeMath::Friction()
 		// Adjust velocity according to proportion
 		for (int i = 0; i < 3; i++)
 		{
-			player->m_vecVelocity[i] * newspeed;
+			player->velocity[i] * newspeed;
 		}
 	}
 
-	mv->m_outWishVel -= (1.f - newspeed) * player->m_vecVelocity;
+	player->outWishVel -= (1.f - newspeed) * player->velocity;
 }
 
 
 //Air movement
 void StrafeMath::AirMove()
 {
-	int			i;
-	Eigen::Vector3d wishvel, wishdir;
-	float		fmove, smove;
-	float		wishspeed;
-	Eigen::Vector3d forward, right, up;
+	Eigen::Vector3d wishdir;
+	float fmove, smove;
+	float wishspeed;
 
-	AngleVectors(mv->m_vecViewAngles, player->m_vecForward, player->m_vecRight, player->m_vecUp);
-
-	// Copy movement amounts
-	fmove = mv->m_flForwardMove;
-	smove = mv->m_flSideMove;
+	Eigen::Vector3d angles = Eigen::Vector3d(0, atan2f(player->viewAngles[1], player->viewAngles[0]) * (180 / PI), 0);
+	AngleVectors(angles, player->forward, player->right, player->up);
 
 	// Zero out z components of movement vectors
-	forward[2] = 0;
-	right[2] = 0;
-	forward.normalize();
-	right.normalize();
+	player->forward[2] = 0;
+	player->right[2] = 0;
+	player->forward.normalize();
+	player->right.normalize();
 
-	for (i = 0; i < 2; i++)       // Determine x and y parts of velocity
-		wishvel[i] = forward[i] * fmove + right[i] * smove;
+	for (int i = 0; i < 2; i++)       // Determine x and y parts of velocity
+		player->wishVel[i] = player->forward[i] * player->forwardMove + player->right[i] * player->sideMove;
 
-	wishvel[2] = 0;             // Zero out z part of velocity
+	player->wishVel[2] = 0;             // Zero out z part of velocity
 
-	wishdir = wishvel;
+	wishdir = player->wishVel;
 	wishdir.normalize();
 
-	wishspeed = VecMagnitude(wishvel);
+	wishspeed = VecMagnitude(player->wishVel);
 
-	if (wishspeed != 0 && (wishspeed > mv->m_flMaxSpeed))
+	if (wishspeed != 0 && (wishspeed > player->maxSpeed))
 	{
-		VectorScale(wishvel, mv->m_flMaxSpeed / wishspeed, wishvel);
-		wishspeed = mv->m_flMaxSpeed;
+		VectorScale(player->wishVel, player->maxSpeed / wishspeed, player->wishVel);
+		wishspeed = player->maxSpeed;
 	}
 
 	AirAccelerate(wishdir, wishspeed, sv_airAccelerate);
@@ -268,7 +271,6 @@ void StrafeMath::AirMove()
 
 void StrafeMath::AirAccelerate(Eigen::Vector3d& wishdir, float wishspeed, float accel)
 {
-	int i;
 	float addspeed, accelspeed, currentspeed;
 	float wishspd;
 
@@ -279,7 +281,7 @@ void StrafeMath::AirAccelerate(Eigen::Vector3d& wishdir, float wishspeed, float 
 		wishspd = airSpeedCap;
 
 	// Determine veer amount
-	currentspeed = DotProduct(mv->m_vecVelocity, wishdir);
+	currentspeed = DotProduct(player->velocity, wishdir);
 
 	// See how much to add
 	addspeed = wishspd - currentspeed;
@@ -289,17 +291,17 @@ void StrafeMath::AirAccelerate(Eigen::Vector3d& wishdir, float wishspeed, float 
 		return;
 
 	// Determine acceleration speed after acceleration
-	accelspeed = accel * wishspeed * intervalPerTick * player->m_surfaceFriction;
+	accelspeed = accel * wishspeed * intervalPerTick * player->surfaceFriction;
 
 	// Cap it
 	if (accelspeed > addspeed)
 		accelspeed = addspeed;
 
 	// Adjust pmove vel.
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		mv->m_vecVelocity[i] += accelspeed * wishdir[i];
-		mv->m_outWishVel[i] += accelspeed * wishdir[i];
+		player->velocity[i] += accelspeed * wishdir[i];
+		player->outWishVel[i] += accelspeed * wishdir[i];
 	}
 }
 
@@ -309,66 +311,21 @@ void StrafeMath::CheckVelocity()
 	for (int i = 0; i < 3; i++)
 	{
 		// Check if it's INF
-		if (player->m_vecVelocity[i] == NAN)
+		if (player->velocity[i] == NAN)
 		{
-			player->m_vecVelocity[i] = 0;
+			player->velocity[i] = 0;
 		}
 
 		// Cap its value
-		if (player->m_vecVelocity[i] > sv_maxVelocity)
+		if (player->velocity[i] > sv_maxVelocity)
 		{
-			player->m_vecVelocity[i] = sv_maxVelocity;
+			player->velocity[i] = sv_maxVelocity;
 		}
-		else if (player->m_vecVelocity[i] < -sv_maxVelocity)
+		else if (player->velocity[i] < -sv_maxVelocity)
 		{
-			player->m_vecVelocity[i] = -sv_maxVelocity;
+			player->velocity[i] = -sv_maxVelocity;
 		}
 	}
-}
-
-void StrafeMath::CaptureMovementKeys()
-{
-		//if pressing W
-	//player.forwardmove += sv_forwardspeed;
-		//if pressing S
-	//player.forwardmove -= sv_forwardspeed;
-		//if pressing A
-	//player.sidemove += sv_sidespeed;
-		//if pressing D
-	//player.sidemove -= sv_sidespeed;
-}
-
-
-//Gravity
-void StrafeMath::StartGravity()
-{
-	float ent_gravity;
-	//mv->m_fl
-	if (player->m_flGravity)
-		ent_gravity = player->m_flGravity;
-	else
-		ent_gravity = 1.0;
-
-	// Add gravity so they'll be in the correct position during movement
-	// yes, this 0.5 looks wrong, but it's not.  
-	mv->m_vecVelocity[2] -= (ent_gravity * sv_gravity * 0.5 * intervalPerTick);
-
-	CheckVelocity();
-}
-
-void StrafeMath::FinishGravity()
-{
-	float ent_gravity;
-
-	if (player->m_flGravity)
-		ent_gravity = player->m_flGravity;
-	else
-		ent_gravity = 1.0;
-
-	// Get the correct velocity for the end of the dt 
-	mv->m_vecVelocity[2] -= (ent_gravity * sv_gravity * intervalPerTick * 0.5);
-
-	CheckVelocity();
 }
 
 
@@ -378,13 +335,13 @@ void AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward, Eigen::Vect
     float angle;
     static float sinpitch, sinyaw, sinroll, cospitch, cosyaw, cosroll;
 
-    angle = angles[0] * (M_PI / 180);
+    angle = angles[0] * (PI / 180);
     sinpitch = sin(angle);
     cospitch = cos(angle);
-    angle = angles[1] * (M_PI / 180);
+    angle = angles[1] * (PI / 180);
     sinyaw = sin(angle);
     cosyaw = cos(angle);
-    angle = angles[2] * (M_PI / 180);
+    angle = angles[2] * (PI / 180);
     sinroll = sin(angle);
     cosroll = cos(angle);
 

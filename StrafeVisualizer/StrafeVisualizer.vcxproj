@@ -157,7 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animations.h" />
-    <ClInclude Include="CMoveData.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="convars.h" />
     <ClInclude Include="DrawUtil.h" />
     <ClInclude Include="MouseSharedDefs.h" />

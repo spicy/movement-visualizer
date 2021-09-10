@@ -44,7 +44,7 @@
     <ClInclude Include="convars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CMoveData.h">
+    <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">

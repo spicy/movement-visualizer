@@ -1,18 +1,11 @@
 #pragma once
 #include <Eigen/Dense>
 #include "convars.h"
-#include "CMoveData.h"
+#include "Player.h"
 
-enum PositionType
+namespace StrafeMath
 {
-	GROUND,
-	AIR
-};
-
-class StrafeMath
-{
-public:
-	void UpdateNecessaryStuff();
+	void ManuallyUpdateStuff();
 	void ProcessMovement();
 
 	void PlayerMove();
@@ -29,17 +22,11 @@ public:
 	void AirMove();
 	void AirAccelerate(Eigen::Vector3d& wishdir, float wishspeed, float airaccel);
 
-	void StartGravity();
-	void FinishGravity();
-
 	void CheckVelocity();
-	void CaptureMovementKeys();
 
 	// Input/Output for this movement
-	static BasePlayer* player;
-	static CMoveData* mv;
-	static PositionType	positionType;
-};
+	extern Player* player;
+}
 
 //Other
 void AngleVectors(Eigen::Vector3d& angles, Eigen::Vector3d& forward, Eigen::Vector3d& right, Eigen::Vector3d& up);

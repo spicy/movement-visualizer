@@ -131,11 +131,12 @@ void DrawUtil::DrawTextSF(sf::RenderTarget& window, const float x, const float y
 /// </summary>
 void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 {
+    window.clear(sf::Color(0, 0, 0));
+
     const int min_x = int(center.x() - 0.5 * double(window.getSize().x) / scale) - 1;
     const int max_x = int(center.x() + 0.5 * double(window.getSize().x) / scale) + 1;
     const int min_y = int(center.y() - 0.5 * double(window.getSize().y) / scale) - 1;
     const int max_y = int(center.y() + 0.5 * double(window.getSize().y) / scale) + 1;
-    window.clear(sf::Color(75, 131, 156));
 
     for (int x = min_x; x < max_x; ++x)
     {
@@ -151,11 +152,11 @@ void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 
             if (i == 0)
             {
-                DrawLine(window, a, b, sf::Color::White, false, 2.0*bounce);
+                DrawLine(window, a, b, sf::Color(255, 255, 255, 128), false, 2.0 * bounce);
             } 
             else 
             {
-                DrawLine(window, a, b, sf::Color(255, 255, 255, 128), false, bounce);
+                DrawLine(window, a, b, sf::Color(255, 255, 255, 64), false, bounce);
             }
         }
     }

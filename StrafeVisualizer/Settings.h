@@ -8,7 +8,7 @@ struct
 	{
 		const int start_w = 2560;
 		const int start_h = 1440;
-		const bool start_fullscreen = false;
+		const bool start_fullscreen = true;
 		const int render_scale = 1;
 	}video;
 }settings;

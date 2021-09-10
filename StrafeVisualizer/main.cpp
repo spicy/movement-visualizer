@@ -1,4 +1,3 @@
-#define NOGDI
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include <iostream>
@@ -7,13 +6,14 @@
 #include <cassert>
 #include <fstream>
 
+#include "StrafeMath.h"
 #include "Animations.h"
 #include "DrawUtil.h"
 #include "Settings.h"
 #include "MouseSharedDefs.h"
 #include "convars.h"
 
-int cur_anim = -1;
+int cur_anim = 0;
 const double pt_smoothing = 0.7;
 
 typedef bool (*sfFuncPtr)(sf::RenderTarget& window);
@@ -24,6 +24,13 @@ static sfFuncPtr ANIM_ARRAY[] =
 };
 
 static const int NUM_ANIMS = sizeof(ANIM_ARRAY) / sizeof(ANIM_ARRAY[0]);
+
+inline void SetMagnitude(Eigen::Vector2d& vec, double magnitude)
+{
+    double old_magnitude = std::sqrtf(vec[0] * vec[0] + vec[1] * vec[1]);
+    vec[0] = (vec[0] * magnitude) / old_magnitude;
+    vec[1] = (vec[1] * magnitude) / old_magnitude;
+}
 
 static void ActivatePoint(const sf::RenderTarget& window) 
 {
@@ -38,6 +45,11 @@ static void ActivatePoint(const sf::RenderTarget& window)
         }
     }
     mouse.select = -1;
+}
+
+inline double VecMagnitude(Eigen::Vector2d& vec)
+{
+    return std::sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
 }
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
@@ -80,6 +92,9 @@ int main(int argc, char *argv[]) {
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_SMOOTH);
+
+    // Create and set up the player
+    StrafeMath::player = new Player;
 
     //Create geometry
     DrawUtil::center = Eigen::Vector2d::Zero();
@@ -130,19 +145,19 @@ int main(int argc, char *argv[]) {
                 {
                 case sf::Keyboard::W:
                     fwdmv += sv_walkspeed;
-                    Animations::fsmove[0] = fwdmv;
+                    StrafeMath::player->forwardMove = fwdmv;
                     break;
                 case sf::Keyboard::S:
                     fwdmv -= sv_walkspeed;
-                    Animations::fsmove[0] = fwdmv;
+                    StrafeMath::player->forwardMove = fwdmv;
                     break;
                 case sf::Keyboard::A:
                     sidemv -= sv_walkspeed;
-                    Animations::fsmove[1] = sidemv;
+                    StrafeMath::player->sideMove = sidemv;
                     break;
                 case sf::Keyboard::D:
                     sidemv += sv_walkspeed;
-                    Animations::fsmove[1] = sidemv;
+                    StrafeMath::player->sideMove = sidemv;
                     break;
                 }
             }
@@ -150,19 +165,20 @@ int main(int argc, char *argv[]) {
             {
                 sf::Keyboard::Key keycode = event.key.code;
 
+                // Create local vars to handle counter strafing (W+S/A+D)
                 switch (keycode)
                 {
                 case sf::Keyboard::W:
-                    Animations::fsmove[0] = 0;
+                    StrafeMath::player->forwardMove = 0;
                     break;
                 case sf::Keyboard::S:
-                    Animations::fsmove[0] = 0;
+                    StrafeMath::player->forwardMove = 0;
                     break;
                 case sf::Keyboard::A:
-                    Animations::fsmove[1] = 0;
+                    StrafeMath::player->sideMove = 0;
                     break;
                 case sf::Keyboard::D:
-                    Animations::fsmove[1] = 0;
+                    StrafeMath::player->sideMove = 0;
                     break;
                 }
             }
@@ -204,6 +220,14 @@ int main(int argc, char *argv[]) {
             Animations::moveablePts[i] *= pt_smoothing;
             Animations::moveablePts[i] += Animations::unfilteredPts[i] * (1.0 - pt_smoothing);
         }
+
+        // Cap the second moveablepoint (eyeangles) to the length 3
+        SetMagnitude(Animations::moveablePts[1], 3);
+
+        // Set the players viewangles corresponding to the point normalized
+        StrafeMath::player->viewAngles[0] = Animations::moveablePts[1][0] / VecMagnitude(Animations::moveablePts[1]);
+        StrafeMath::player->viewAngles[1] = -Animations::moveablePts[1][1] / VecMagnitude(Animations::moveablePts[1]);
+
 
         //Draw the background
         renderTexture.setActive(true);

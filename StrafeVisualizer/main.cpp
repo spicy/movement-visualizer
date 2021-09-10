@@ -34,7 +34,7 @@ inline void SetMagnitude(Eigen::Vector2d& vec, double magnitude)
 
 static void ActivatePoint(const sf::RenderTarget& window) 
 {
-    const Eigen::Vector2d p = DrawUtil::FromPix(window, mouse.pos * settings.video.render_scale);
+    const Eigen::Vector2d p = DrawUtil::PixelsToWorld(window, mouse.pos * settings.video.render_scale);
     for (int i = 0; i < 2; ++i) 
     {
         const double diff = (Animations::moveablePts[i] - p).norm();
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
         //Move active point
         if (mouse.select >= 0)
         {
-            Animations::unfilteredPts[mouse.select] = DrawUtil::FromPix(renderTexture, mouse.pos * settings.video.render_scale);
+            Animations::unfilteredPts[mouse.select] = DrawUtil::PixelsToWorld(renderTexture, mouse.pos * settings.video.render_scale);
         }
 
         //Filter points

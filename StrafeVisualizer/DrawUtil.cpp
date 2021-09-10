@@ -8,7 +8,7 @@
 
 Eigen::Vector2d DrawUtil::center = Eigen::Vector2d::Zero();
 double DrawUtil::scale = 75;
-float DrawUtil::render_scale = 2.0f;
+float DrawUtil::render_scale = 1.0f;
 
 /// <summary>
 /// 
@@ -126,6 +126,20 @@ void DrawUtil::DrawTextSF(sf::RenderTarget& window, const float x, const float y
     window.draw(text);
 }
 
+void DrawUtil::DrawTextSF(sf::RenderTarget& window, const Eigen::Vector2d& point, sf::Font font, sf::String& string, int pixelSize, const sf::Color& color)
+{
+    sf::Text text;
+    text.setFont(font);
+    text.setString(string);
+    text.setCharacterSize(pixelSize);
+    text.setFillColor(color);
+    text.setStyle(sf::Text::Style::Regular);
+    text.setPosition(ToSF((point - center) * scale + HalfSize(window)));
+
+    // inside the main loop, between window.clear() and window.display()
+    window.draw(text);
+}
+
 /// <summary>
 /// 
 /// </summary>
@@ -188,9 +202,18 @@ void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 /// <summary>
 /// 
 /// </summary>
-Eigen::Vector2d DrawUtil::FromPix(const sf::RenderTarget& window, const sf::Vector2i& p) 
+Eigen::Vector2d DrawUtil::PixelsToWorld(const sf::RenderTarget& window, const sf::Vector2i& p)
 {
-    return Eigen::Vector2d(double(p.x) - window.getSize().x*0.5, double(p.y) - window.getSize().y*0.5) / scale + center;
+    return Eigen::Vector2d(double(p.x) - window.getSize().x * 0.5, double(p.y) - window.getSize().y * 0.5) / scale + center;
+}
+
+
+/// <summary>
+/// 
+/// </summary>
+sf::Vector2i DrawUtil::WorldToPixels(const sf::RenderTarget& window, const Eigen::Vector2d& w)
+{
+    return sf::Vector2i((w[0] + window.getSize().x * 0.5) / scale + center[0], (w[1] + window.getSize().y * 0.5) / scale + center[1]);
 }
 
 /// <summary>

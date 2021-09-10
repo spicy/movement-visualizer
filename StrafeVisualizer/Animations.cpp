@@ -82,7 +82,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
     {
         MODE_POINTS,
         MODE_ARROWS,
-        MODE_TEXT2,
+        MODE_SET_VELOCITY,
         MODE_VIEWANGLES,
         MODE_KEYS,
         MODE_EYEANGLES,
@@ -133,7 +133,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 			DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 275, 0, sf::Vector2f(550, 110), sf::Color(255, 255, 255, 255 * tolerance));
             DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 275 + 20, 20, font, text, fontSize, textColor);
         }
-        else if (mode == MODE_TEXT2)
+        else if (mode == MODE_SET_VELOCITY)
         {
             // Set the players velocity corresponding to the point scaled up
             player->velocity[0] = moveablePts[0][0] * DrawUtil::scale;
@@ -278,9 +278,9 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                 {
                     if (mode == MODE_PROCESS_MOVEMENT_TEXT)
                     {
-                        sf::String text = "We can now check how the wish velocity interacts with\nour players velocity.";
+                        sf::String text = "We can now watch how the wish velocity interacts with\nour players velocity.\n\nTry various viewangles and keypresses!";
                         // Draw the top rect
-                        DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(400, 200), sf::Color(255, 255, 255, 255 * tolerance));
+                        DrawUtil::DrawRect(window, 0, 0, sf::Vector2f(570, 200), sf::Color(255, 255, 255, 255 * tolerance));
                         DrawUtil::DrawTextSF(window, 20, 20, font, text, fontSize, textColor);
                     }
 
@@ -290,6 +290,11 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
                     Eigen::Vector2d ptVelocity = Eigen::Vector2d(player->velocity[0] / DrawUtil::scale, -player->velocity[1] / DrawUtil::scale);
                     DrawUtil::DrawLine(window, DrawUtil::center, ptVelocity, sf::Color(14, 60, 158), false, 20.0);
                     DrawUtil::DrawPoint(window, ptVelocity, sf::Color(14, 60, 158), 20.0);
+
+                    // Draw Vel Text
+                    sf::String text2 = std::to_string((int)VecMagnitude(player->velocity));
+                    Eigen::Vector2d ptVel(player->velocity[0] + 20, -player->velocity[1] - 20);
+                    DrawUtil::DrawTextSF(window, ptVel / DrawUtil::scale, font, text2, fontSize, sf::Color(14, 60, 158));
 
                     // Draw WishVel arrow
                     double wishspeed = VecMagnitude(player->wishVel);

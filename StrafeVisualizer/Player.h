@@ -6,6 +6,7 @@ enum PositionType
 	AIR
 };
 
+// Class representing a combination of CS:S/CS:GO's BasePlayer+CMoveData
 class Player
 {
 public:

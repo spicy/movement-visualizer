@@ -26,6 +26,7 @@ sf::Color wishVelColor(122, 235, 52);
 sf::Color velocityColor(14, 60, 158);
 sf::Color nextVelColor(245, 197, 103);
 sf::Color viewanglesColor(191, 55, 10);
+const int fontSize = 25;
 
 int Animations::frame = 0;
 bool Animations::animate_out = false;
@@ -105,7 +106,6 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
     const Eigen::Vector2d& ptYaw = moveablePts[1];
 
     sf::Font font;
-    const int fontSize = 25;
     if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
     {
         if (mode == MODE_KEYS)
@@ -314,16 +314,17 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
 
     enum Mode
     {
-        MODE_TEXT1,
-        MODE_TRIANGLE,
+        MODE_CODE_REVIEW,
         MODE_VELOCITY,
         MODE_WISHVEL,
         MODE_NEXTVEL,
         MODE_TEXT2,
+        MODE_COMBINATIONS,
+        MODE_ALL_PERFANGLES,
         MODE_END
     };
 
-    static Mode mode = MODE_TEXT1;
+    static Mode mode = MODE_VELOCITY;
 
     static double tolerance = 0;
     double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.45, 45.0) : 1.0;
@@ -337,7 +338,11 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
     sf::Font font;
     if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
     {
-        if (mode >= MODE_TEXT1)
+        if (mode == MODE_CODE_REVIEW)
+        {
+
+        }
+        else if (mode >= MODE_VELOCITY)
         {
             static double anim = 0;
             static double animDelta = 0;
@@ -346,20 +351,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
             Eigen::Vector2d ptTriangleSide(-7 + anim, 0);
             Eigen::Vector2d ptTriangleTip(-7 + anim, -1);
 
-            if (mode == MODE_TRIANGLE || mode == MODE_TEXT1)
-            {
-                DrawUtil::DrawLine(window, left, ptTriangleSide, sf::Color::White, false, 10.0 * bounce);
-                DrawUtil::DrawLine(window, left, ptTriangleTip, sf::Color::White, false, 10.0 * bounce);
-                DrawUtil::DrawLine(window, ptTriangleSide, ptTriangleTip, sf::Color::White, false, 10.0 * bounce);
-
-                if (mode == MODE_TEXT1)
-                {
-                    sf::String text = "This triangle will show why high velocities require 'slower' mouse movements\nAs our velocity increases, the angle between our next\nvelocity and our";
-                    DrawUtil::DrawRect(window, 200, 200, sf::Vector2f(400, 150), sf::Color(255, 255, 255, 255));
-                    DrawUtil::DrawTextSF(window, 180, 220, font, text, 40, sf::Color(255, 255, 255, 255));
-                }
-            }
-            else if (mode == MODE_VELOCITY)
+            if (mode == MODE_VELOCITY)
             {
                 RUN_ONCE
                 {
@@ -373,8 +365,8 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
                 DrawUtil::DrawPoint(window, ptTriangleSide, velocityColor, 20 * bounce);
 
                 sf::String text = "Velocity";
-                DrawUtil::DrawRect(window, 100, 800, sf::Vector2f(400, 200), sf::Color(255, 255, 255, 255 * tolerance));
-                DrawUtil::DrawTextSF(window, 120, 820, font, text, 40, sf::Color(65, 111, 196, 255 * tolerance));
+                Eigen::Vector2d point(left[0], left[1] + 0.25);
+                DrawUtil::DrawTextSF(window, point, font, text, fontSize, sf::Color(65, 111, 196, 255 * tolerance));
             }
             else if (mode == MODE_WISHVEL)
             {
@@ -392,11 +384,12 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
 
                 sf::String text = "Velocity";
                 sf::String text2 = "Wishvel";
-                DrawUtil::DrawRect(window, 100, 800, sf::Vector2f(400, 200), sf::Color(255, 255, 255, 255));
-                DrawUtil::DrawTextSF(window, 120, 820, font, text, 40, sf::Color(65, 111, 196));
-                DrawUtil::DrawTextSF(window, 120, 870, font, text2, 40, sf::Color(122, 235, 52, 255 * tolerance));
+                Eigen::Vector2d point(left[0], left[1] + 0.25);
+                Eigen::Vector2d point2(left[0] + 6, left[1] + 0.25);
+                DrawUtil::DrawTextSF(window, point, font, text, fontSize, sf::Color(65, 111, 196));
+                DrawUtil::DrawTextSF(window, point2, font, text2, fontSize, sf::Color(122, 235, 52, 255 * tolerance));
             }
-            else if (mode == MODE_NEXTVEL || mode == MODE_TEXT1)
+            else if (mode == MODE_NEXTVEL)
             {
                 RUN_ONCE
                 {
@@ -410,20 +403,21 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
                 DrawUtil::DrawPoint(window, ptTriangleSide, velocityColor, 20);
                 DrawUtil::DrawPoint(window, ptTriangleTip, wishVelColor, 20);
 
-                sf::String text = "Velocity";
+                sf::String text  = "Velocity";
                 sf::String text2 = "Wishvel";
                 sf::String text3 = "Next Velocity";
-                DrawUtil::DrawRect(window, 100, 800, sf::Vector2f(400, 200), sf::Color(255, 255, 255, 255));
-                DrawUtil::DrawTextSF(window, 120, 820, font, text, 40, sf::Color(65, 111, 196));
-                DrawUtil::DrawTextSF(window, 120, 870, font, text2, 40, wishVelColor);
-                DrawUtil::DrawTextSF(window, 120, 920, font, text3, 40, sf::Color(245, 197, 103, 255 * tolerance));
+                Eigen::Vector2d point(left[0], left[1] + 0.25);
+                Eigen::Vector2d point2(left[0] + 6, left[1] + 0.25);
+                Eigen::Vector2d point3(left[0] + 12, left[1] + 0.25);
+                DrawUtil::DrawTextSF(window, point, font, text, fontSize, velocityColor);
+                DrawUtil::DrawTextSF(window, point2, font, text2, fontSize, wishVelColor);
+                DrawUtil::DrawTextSF(window, point3, font, text3, fontSize, sf::Color(245, 197, 103, 255 * tolerance));
 
-                if (mode == MODE_TEXT2)
-                {
-                    sf::String text = "Notice how this triangle";
-                    DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 200, 800, sf::Vector2f(400, 150), sf::Color(255, 255, 255, 255 * tolerance));
-                    DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 180, 820, font, text, 40, sf::Color(255, 255, 255, 255 * tolerance));
-                }
+                sf::String text4 = "These vectors show why higher velocities require 'slower' mouse movements.\nAs our velocity increases, the angle between our next ticks velocity and our\ncurrent velocity decreases.\n\nSince we have already proved in our engine code review that maximizing speed\ngain is done by making the wishvel perpendicular to the current velocity, we\nknow that in order to make our wishvel perpendicular we can make our view\nangle our current velocity direction offsetted some specific keypress angle.\n\nIn the normal style, the perfect angle to be looking would be our current ticks\nvelocity.";
+                // of all of these keypress combinations, we can notice a pattern. Each possible key direction has a difference of 45 degrees. This means that whatever our current velocity is, there are 8 possible viewangles that allow for perfect speedgain depending on the keypresses.
+                
+                DrawUtil::DrawRect(window, 50, 50, sf::Vector2f(800, 400), sf::Color(255, 255, 255, 255 * tolerance));
+                DrawUtil::DrawTextSF(window, 70, 70, font, text4, fontSize, textColor);
             }
 
             if (anim > fabs(left[0] * 2))

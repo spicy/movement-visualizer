@@ -19,8 +19,8 @@ const double pt_smoothing = 0.7;
 typedef bool (*sfFuncPtr)(sf::RenderTarget& window);
 static sfFuncPtr ANIM_ARRAY[] =
 { 
-  //Animations::PerfAngleDemo,
-  Animations::WishVelDemonstration
+  //Animations::WishVelDemonstration,
+  Animations::PerfAngleDemo
 };
 
 static const int NUM_ANIMS = sizeof(ANIM_ARRAY) / sizeof(ANIM_ARRAY[0]);

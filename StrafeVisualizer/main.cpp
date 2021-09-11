@@ -19,7 +19,7 @@ const double pt_smoothing = 0.7;
 typedef bool (*sfFuncPtr)(sf::RenderTarget& window);
 static sfFuncPtr ANIM_ARRAY[] =
 { 
-  //Animations::WishVelDemonstration,
+  Animations::WishVelDemonstration,
   Animations::PerfAngleDemo
 };
 

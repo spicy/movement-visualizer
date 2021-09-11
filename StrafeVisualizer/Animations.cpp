@@ -390,7 +390,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
             }
             else
             {
-                sf::String text2 = "There is another pattern to notice, for any velocity vector, there are only two\nperpendicular wish velocity vectors (yellow) that maximize speedgain.\n\nWe can change the viewangle to line up any of the green wish velocity\nvectors to the perpendicular velocity vectors to find which keypresses would\ngive perfect speedgain";
+                sf::String text2 = "There is another pattern to notice, for any velocity vector, there are only two\nperpendicular wish velocity vectors (yellow) that maximize speedgain.\n\nWe can change the viewangle to line up any of the green wish velocity\nvectors to the yellow perpendicular velocity vectors to find which keypresses\nwould give perfect speedgain.";
                 DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 390, 0, sf::Vector2f(780, 240), sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 390 + 20, 20, font, text2, fontSize, textColor);
 

@@ -10,27 +10,19 @@ Eigen::Vector2d DrawUtil::center = Eigen::Vector2d::Zero();
 double DrawUtil::scale = 75;
 float DrawUtil::render_scale = 1.0f;
 
-/// <summary>
-/// 
-/// </summary>
+
 sf::Vector2f DrawUtil::ToSF(const Eigen::Vector2d& v)
 {
     return sf::Vector2f((float)v.x(), (float)v.y());
 }
 
 
-/// <summary>
-/// 
-/// </summary>
 Eigen::Vector2d DrawUtil::HalfSize(const sf::RenderTarget& window)
 {
     return Eigen::Vector2d((double)window.getSize().x, (double)window.getSize().y) * 0.5;
 }
 
 
-/// <summary>
-/// 
-/// </summary>
 void DrawUtil::DrawCircle(sf::RenderTarget& window, const Eigen::Vector2d& c, const sf::Color& color, double r, double thickness) 
 {
     sf::CircleShape circle(float(r), 200);
@@ -42,9 +34,7 @@ void DrawUtil::DrawCircle(sf::RenderTarget& window, const Eigen::Vector2d& c, co
     window.draw(circle);
 }
 
-/// <summary>
-/// 
-/// </summary>
+
 void DrawUtil::DrawRect(sf::RenderTarget& window, const float x, const float y, const sf::Vector2f& size, const sf::Color& color)
 {
     sf::RectangleShape rect(size);
@@ -53,9 +43,7 @@ void DrawUtil::DrawRect(sf::RenderTarget& window, const float x, const float y, 
     window.draw(rect);
 }
 
-/// <summary>
-/// 
-/// </summary>
+
 void DrawUtil::DrawLine(sf::RenderTarget& window, const Eigen::Vector2d& _a, const Eigen::Vector2d& _b, const sf::Color& color, bool extend, double thickness)
 {
     std::vector<sf::Vertex> vertex_array(2);
@@ -77,9 +65,6 @@ void DrawUtil::DrawLine(sf::RenderTarget& window, const Eigen::Vector2d& _a, con
 }
 
 
-/// <summary>
-///
-/// </summary>
 void DrawUtil::DrawPoint(sf::RenderTarget& window, const Eigen::Vector2d& c, const sf::Color& color, double radius) 
 {
     sf::CircleShape circle((float)radius * render_scale);
@@ -87,28 +72,6 @@ void DrawUtil::DrawPoint(sf::RenderTarget& window, const Eigen::Vector2d& c, con
     circle.setFillColor(color);
     circle.setPosition(ToSF((c - center)*scale + HalfSize(window)));
     window.draw(circle);
-}
-
-
-/// <summary>
-///  WIP WIP WIP WIP
-/// </summary>
-void DrawUtil::DrawArrow(sf::RenderTarget& window, const Eigen::Vector2d& start, const Eigen::Vector2d& end, const sf::Color& color, double lineThickness, double triRadius)
-{
-
-    //Draw a line
-    DrawLine(window, start, end, color, false, lineThickness);
-    //Draw a triangle
-    static double ang = std::atan2f((-end[1]) - (-start[1]), end[0] - start[0]) * (180 / M_PI); // - y values since opposite?
-
-    sf::CircleShape triangle;
-    triangle.setRadius(triRadius);
-    triangle.setPointCount(3);
-    triangle.setRotation(-(ang - 90));  //wrong
-    triangle.setPosition(ToSF((end - center) * scale + HalfSize(window)));
-    triangle.setFillColor(color);
-
-    window.draw(triangle);
 }
 
 
@@ -126,6 +89,7 @@ void DrawUtil::DrawTextSF(sf::RenderTarget& window, const float x, const float y
     window.draw(text);
 }
 
+
 void DrawUtil::DrawTextSF(sf::RenderTarget& window, const Eigen::Vector2d& point, sf::Font font, sf::String& string, int pixelSize, const sf::Color& color)
 {
     sf::Text text;
@@ -140,9 +104,7 @@ void DrawUtil::DrawTextSF(sf::RenderTarget& window, const Eigen::Vector2d& point
     window.draw(text);
 }
 
-/// <summary>
-/// 
-/// </summary>
+
 void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 {
     window.clear(sf::Color(0, 0, 0));
@@ -199,27 +161,18 @@ void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 
 
 
-/// <summary>
-/// 
-/// </summary>
 Eigen::Vector2d DrawUtil::PixelsToWorld(const sf::RenderTarget& window, const sf::Vector2i& p)
 {
     return Eigen::Vector2d(double(p.x) - window.getSize().x * 0.5, double(p.y) - window.getSize().y * 0.5) / scale + center;
 }
 
 
-/// <summary>
-/// 
-/// </summary>
 sf::Vector2i DrawUtil::WorldToPixels(const sf::RenderTarget& window, const Eigen::Vector2d& w)
 {
     return sf::Vector2i((w[0] + window.getSize().x * 0.5) / scale + center[0], (w[1] + window.getSize().y * 0.5) / scale + center[1]);
 }
 
 
-/// <summary>
-/// 
-/// </summary>
 Eigen::Vector2d DrawUtil::AngleToWorld(const sf::RenderTarget& window, double thetaRad, double magnitude)
 {
     Eigen::Vector2d point(1, 0);
@@ -227,18 +180,12 @@ Eigen::Vector2d DrawUtil::AngleToWorld(const sf::RenderTarget& window, double th
 }
 
 
-/// <summary>
-/// 
-/// </summary>
 double DrawUtil::SmoothBounce(double tolerance, double trigger_tolerance, double a)
 {
     return std::max(1.0 + a*(1.0 - tolerance)*std::exp(10*(trigger_tolerance - tolerance))*(1.0 - std::exp(trigger_tolerance - tolerance)), 0.0);
 }
 
 
-/// <summary>
-/// 
-/// </summary>
 double DrawUtil::Snappy(double tolerance)
 {
     return tolerance *(tolerance *(tolerance - 1.0) + 1.0);

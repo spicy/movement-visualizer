@@ -216,6 +216,17 @@ sf::Vector2i DrawUtil::WorldToPixels(const sf::RenderTarget& window, const Eigen
     return sf::Vector2i((w[0] + window.getSize().x * 0.5) / scale + center[0], (w[1] + window.getSize().y * 0.5) / scale + center[1]);
 }
 
+
+/// <summary>
+/// 
+/// </summary>
+Eigen::Vector2d DrawUtil::AngleToWorld(const sf::RenderTarget& window, double thetaRad, double magnitude)
+{
+    Eigen::Vector2d point(1, 0);
+    return Eigen::Vector2d(point[0] * std::cosf(-thetaRad) - point[1] * std::sinf(-thetaRad), point[0] * std::sinf(-thetaRad) + point[1] * std::cosf(-thetaRad)) * magnitude;
+}
+
+
 /// <summary>
 /// 
 /// </summary>

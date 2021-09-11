@@ -75,6 +75,7 @@ bool Animations::Background(sf::RenderTarget& window, bool start_anim)
     return animate_out;
 }
 
+
 bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 {
     RUN_ONCE
@@ -304,6 +305,7 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
     return UpdateMode(mode);
 }
 
+
 bool Animations::PerfAngleDemo(sf::RenderTarget& window)
 {
     RUN_ONCE
@@ -315,16 +317,16 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
     enum Mode
     {
         MODE_CODE_REVIEW,
+        MODE_COMBINATIONS,
+        MODE_ALL_PERFANGLES,
         MODE_VELOCITY,
         MODE_WISHVEL,
         MODE_NEXTVEL,
         MODE_TEXT2,
-        MODE_COMBINATIONS,
-        MODE_ALL_PERFANGLES,
         MODE_END
     };
 
-    static Mode mode = MODE_VELOCITY;
+    static Mode mode = MODE_COMBINATIONS;
 
     static double tolerance = 0;
     double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.45, 45.0) : 1.0;
@@ -341,6 +343,54 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
         if (mode == MODE_CODE_REVIEW)
         {
 
+        }
+        else if (mode == MODE_COMBINATIONS)
+        {
+            RUN_ONCE
+            {
+                tolerance = 0;
+            }
+            sf::String text = "Of all of these keypress combinations, we can notice a pattern. Each\npossible key direction has a difference of 45 degrees.";
+            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 350, 0, sf::Vector2f(700, 110), sf::Color(255, 255, 255, 255 * tolerance));
+            DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 350 + 20, 20, font, text, fontSize, textColor);
+
+            double start_rad = 0.0f;
+            // Loop through all possible key input directions
+            for (int i = 0; i < 8; i++)
+            {
+                double rad = start_rad + (PI/4 * i);
+                Eigen::Vector2d point = DrawUtil::AngleToWorld(window, rad, 1.5);
+
+                DrawUtil::DrawLine(window, DrawUtil::center, point, wishVelColor, false, 15.0);
+                DrawUtil::DrawPoint(window, point, wishVelColor, 20);
+            }
+        }
+        else if (mode == MODE_ALL_PERFANGLES)
+        {
+            RUN_ONCE
+            {
+                tolerance = 0;
+            }
+            sf::String text = "This means that whatever our current velocity is, there are 8 possible viewangles that allow for perfect speedgain depending on a specific keypress that makes the wishvel perpendicular to the current velocity.\n\nThere is another pattern to notice, for any velocity vector, there are only two possible perpendicular wish velocity vectors that maximize speedgain.";
+            DrawUtil::DrawRect(window, (screenDimensions.x / 2) - 400, 0, sf::Vector2f(800, 260), sf::Color(255, 255, 255, 255 * tolerance));
+            DrawUtil::DrawTextSF(window, (screenDimensions.x / 2) - 400 + 20, 20, font, text, fontSize, textColor);
+
+            DrawUtil::DrawLine(window, DrawUtil::center, ptYaw, sf::Color(191, 55, 10, 255 * tolerance), false, 20.0 * bounce);
+            DrawUtil::DrawPoint(window, ptYaw, viewanglesColor, 20.0 * bounce);
+
+
+            double start_rad = std::atan2f(player->viewAngles[1], player->viewAngles[0]);
+            // Loop through all possible key input directions
+            for (int i = 0; i < 8; i++)
+            {
+                double rad = start_rad + (PI / 4 * i);
+                Eigen::Vector2d point = DrawUtil::AngleToWorld(window, rad, 1.5);
+
+                DrawUtil::DrawLine(window, DrawUtil::center, point, wishVelColor, false, 15.0);
+                DrawUtil::DrawPoint(window, point, wishVelColor, 20);
+            }
+            //There is another pattern to notice, for any velocity vector, there are only two possible perpendicular wish velocity vectors that maximize speedgain.
+            //
         }
         else if (mode >= MODE_VELOCITY)
         {
@@ -414,8 +464,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
                 DrawUtil::DrawTextSF(window, point3, font, text3, fontSize, sf::Color(245, 197, 103, 255 * tolerance));
 
                 sf::String text4 = "These vectors show why higher velocities require 'slower' mouse movements.\nAs our velocity increases, the angle between our next ticks velocity and our\ncurrent velocity decreases.\n\nSince we have already proved in our engine code review that maximizing speed\ngain is done by making the wishvel perpendicular to the current velocity, we\nknow that in order to make our wishvel perpendicular we can make our view\nangle our current velocity direction offsetted some specific keypress angle.\n\nIn the normal style, the perfect angle to be looking would be our current ticks\nvelocity.";
-                // of all of these keypress combinations, we can notice a pattern. Each possible key direction has a difference of 45 degrees. This means that whatever our current velocity is, there are 8 possible viewangles that allow for perfect speedgain depending on the keypresses.
-                
+
                 DrawUtil::DrawRect(window, 50, 50, sf::Vector2f(800, 400), sf::Color(255, 255, 255, 255 * tolerance));
                 DrawUtil::DrawTextSF(window, 70, 70, font, text4, fontSize, textColor);
             }

@@ -19,6 +19,7 @@ public:
 	static Eigen::Vector2d HalfSize(const sf::RenderTarget& window);
 
 	static Eigen::Vector2d PixelsToWorld(const sf::RenderTarget& window, const sf::Vector2i& p);
+	static Eigen::Vector2d AngleToWorld(const sf::RenderTarget& window, double thetaRad, double magnitude);
 	static sf::Vector2i WorldToPixels(const sf::RenderTarget& window, const Eigen::Vector2d& w);
 
 	static double SmoothBounce(double t, double trigger_t, double a);

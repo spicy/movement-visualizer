@@ -9,12 +9,10 @@
 
 An interactive animation application that visualizes movement for strafe based video games (ex. CS:GO and CS:S).
 
-This was used for animations for this video
+This was used for animations for [this](http://youtube.com) video
 
 ### Screenshot of the Strafe Visualizer
 ![Strafe Visualizer](visualizer.png)
-
-### Video of its use
 
 ### Download
 Download the [latest release](https://github.com/spicy/StrafeVisualizer/releases/latest) to test various inputs and learn how CS:S/CS:GO movement works.

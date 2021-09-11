@@ -486,3 +486,12 @@ StrafeVisualizer/Debug/StrafeVisualizer.vcxproj.FileListAbsolute.txt
 *.ipch
 StrafeVisualizer/sshot.png
 StrafeVisualizer/visualizer.png
+Release/visualizer.png
+packages/Costura.Fody.5.6.0/netstandardweaver/Costura.Fody.xcf
+packages/Costura.Fody.5.6.0/netclassicweaver/Costura.Fody.xcf
+packages/Costura.Fody.5.6.0/lib/netstandard1.0/Costura.xml
+packages/Costura.Fody.5.6.0/icon.png
+packages/Costura.Fody.5.6.0/Costura.Fody.5.6.0.nupkg
+packages/Costura.Fody.5.6.0/build/Costura.Fody.targets
+packages/Costura.Fody.5.6.0/build/Costura.Fody.props
+packages/Costura.Fody.5.6.0/.signature.p7s

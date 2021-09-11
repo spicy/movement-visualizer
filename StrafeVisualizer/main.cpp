@@ -59,12 +59,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 #else
 int main(int argc, char *argv[]) {
 #endif
-    //Get the screen size
-    sf::VideoMode screenSize = sf::VideoMode::getDesktopMode();
-    screenSize = sf::VideoMode(settings.video.start_w, settings.video.start_h, screenSize.bitsPerPixel);
-    DrawUtil::render_scale = float(settings.video.render_scale) * 0.5f;
-    
-    //GL settings
+    // GL-settings
     sf::ContextSettings cSettings;
     cSettings.depthBits = 24;
     cSettings.stencilBits = 8;
@@ -72,7 +67,11 @@ int main(int argc, char *argv[]) {
     cSettings.majorVersion = 2;
     cSettings.minorVersion = 0;
 
-    //Create the window
+    sf::VideoMode screenSize = sf::VideoMode::getDesktopMode();
+    screenSize = sf::VideoMode(settings.video.start_w, settings.video.start_h, screenSize.bitsPerPixel);
+    DrawUtil::render_scale = float(settings.video.render_scale) * 0.5f;
+
+    // Create the window
     sf::RenderWindow window;
     sf::Uint32 window_style = (settings.video.start_fullscreen ? sf::Style::Fullscreen : sf::Style::Resize | sf::Style::Close);
     window.create(screenSize, "Strafe Visualizer by spicy", window_style, cSettings);
@@ -80,25 +79,25 @@ int main(int argc, char *argv[]) {
     window.requestFocus();
     sf::View view = window.getDefaultView();
 
-    //Create the render texture 4 times larger than the window
-    sf::RenderTexture renderTexture;
-    renderTexture.create(window.getSize().x * settings.video.render_scale, window.getSize().y * settings.video.render_scale, cSettings);
-    renderTexture.setSmooth(true);
-    renderTexture.setActive(true);
-
-    //Setup OpenGL things
+    // Setup OpenGL things
     glHint(GL_POINT_SMOOTH, GL_NICEST);
     glHint(GL_LINE_SMOOTH, GL_NICEST);
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_SMOOTH);
 
+    // Create the render texture 4 times larger than the window
+    sf::RenderTexture renderTexture;
+    renderTexture.create(window.getSize().x * settings.video.render_scale, window.getSize().y * settings.video.render_scale, cSettings);
+    renderTexture.setSmooth(true);
+    renderTexture.setActive(true);
+
     // Create and set up the player
     StrafeMath::player = new Player;
 
-    //Create geometry
     DrawUtil::center = Eigen::Vector2d::Zero();
-    DrawUtil::scale = 75 * settings.video.render_scale; //130 before
+    DrawUtil::scale = 75 * settings.video.render_scale;
+
     Animations::unfilteredPts[0] = Eigen::Vector2d(1, 0);
     Animations::unfilteredPts[1] = Eigen::Vector2d(1, 0);
 
@@ -107,7 +106,7 @@ int main(int argc, char *argv[]) {
         Animations::moveablePts[i] = Animations::unfilteredPts[i];
     }
 
-    //Main Loop
+    bool screenshot = false;
     while (window.isOpen()) 
     {
         sf::Event event;
@@ -136,6 +135,10 @@ int main(int argc, char *argv[]) {
                     {
                         cur_anim += 1;
                     }
+                }
+                else if (keycode == sf::Keyboard::F1) 
+                {
+                    screenshot = true;
                 }
 
                 // Create local vars to handle counter strafing (W+S/A+D)
@@ -208,13 +211,13 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        //Move active point
+        // Get the mouse active point
         if (mouse.select >= 0)
         {
             Animations::unfilteredPts[mouse.select] = DrawUtil::PixelsToWorld(renderTexture, mouse.pos * settings.video.render_scale);
         }
 
-        //Filter points
+        // Filter points
         for (int i = 0; i < 2; ++i) 
         {
             Animations::moveablePts[i] *= pt_smoothing;
@@ -229,26 +232,32 @@ int main(int argc, char *argv[]) {
         StrafeMath::player->viewAngles[1] = -Animations::moveablePts[1][1] / VecMagnitude(Animations::moveablePts[1]);
 
 
-        //Draw the background
+        // Draw the background
         renderTexture.setActive(true);
         Animations::Background(renderTexture, cur_anim >= 0);
 
-        //Draw the foreground
+        // Draw the foreground
         if (cur_anim > 0 && cur_anim <= NUM_ANIMS && ANIM_ARRAY[cur_anim - 1](renderTexture)) 
         {
            Animations::animate_out = false;
            cur_anim += 1;
         }
 
-        //Finish drawing to the texture
+        // Finish drawing to the texture
         renderTexture.display();
 
-        //Draw texture to window
+        // Draw texture to window
         window.setActive(true);
         const sf::Texture& texture = renderTexture.getTexture();
         sf::Sprite sprite(texture);
         sprite.setScale(1.0f / float(settings.video.render_scale), 1.0f / float(settings.video.render_scale));
         window.draw(sprite);
+
+        if (screenshot) 
+        {
+            texture.copyToImage().saveToFile("visualizer.png");
+            screenshot = false;
+        }
 
         //Flip the screen buffer
         window.display();

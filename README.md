@@ -12,7 +12,7 @@ An interactive animation application that visualizes movement for strafe based v
 This was used for animations for this video
 
 ### Screenshot of the Strafe Visualizer
-![Strafe Visualizer](https://github.com/spicy/StrafeVisualizer/blob/master/visualizer.png?raw=true)
+![Strafe Visualizer](visualizer.png)
 
 ### Video of its use
 

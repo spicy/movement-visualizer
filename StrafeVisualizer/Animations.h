@@ -14,4 +14,5 @@ public:
 	static bool Background(sf::RenderTarget& window, bool staret_anim);
 	static bool WishVelDemonstration(sf::RenderTarget& window);
 	static bool PerfAngleDemo(sf::RenderTarget& window);
+	static bool End(sf::RenderTarget& window);
 };

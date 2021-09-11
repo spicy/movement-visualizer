@@ -9,7 +9,7 @@
 
 An interactive animation application that visualizes movement for strafe based video games (ex. CS:GO and CS:S).
 
-This was used for animations for [this](http://youtube.com) video
+This application was used for animations for [this](http://youtube.com) video!
 
 ### Screenshot of the Strafe Visualizer
 ![Strafe Visualizer](visualizer.png)
@@ -19,7 +19,7 @@ Download the [latest release](https://github.com/spicy/StrafeVisualizer/releases
 
 ## FAQ
 ### How do I move to the next animation?
-Press <kbd>SPACE</kbd>.
+Press <kbd>SPACE</kbd>
 
 ## Building
 Dependencies: `SFML 2`, `Eigen 3`.

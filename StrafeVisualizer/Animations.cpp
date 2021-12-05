@@ -84,7 +84,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
       unfilteredPts[1] = Eigen::Vector2d(1, 0);
     }
 
-        enum Mode
+    enum Mode
     {
         MODE_CODE_REVIEW,
         MODE_COMBINATIONS,
@@ -96,7 +96,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
         MODE_END
     };
 
-    static Mode mode = MODE_COMBINATIONS;
+    static Mode mode = MODE_CODE_REVIEW;
 
     static double tolerance = 0;
     double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.45, 45.0) : 1.0;

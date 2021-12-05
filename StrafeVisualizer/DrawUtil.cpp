@@ -160,6 +160,11 @@ void DrawUtil::DrawGrid(sf::RenderTarget& window, double tolerance)
 }
 
 
+//void DrawUtil::DrawKeypresses(sf::RenderTarget& window, Eigen::Vector2d& point, sf::Font font, int pixelSize, )
+//{
+//    Eigen::Vector2d wPoint(point[0] + 10, point[1] + 10);
+//    DrawTextSF(window, point, font, "W", pixelSize, sf::Color::White)
+//
 
 Eigen::Vector2d DrawUtil::PixelsToWorld(const sf::RenderTarget& window, const sf::Vector2i& p)
 {

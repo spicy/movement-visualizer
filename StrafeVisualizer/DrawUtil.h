@@ -14,6 +14,8 @@ public:
 	static void DrawTextSF(sf::RenderTarget& window, const Eigen::Vector2d& point, sf::Font font, sf::String& string, int pixelSize, const sf::Color& color);
 	static void DrawGrid(sf::RenderTarget& window, double t);
 
+	static void DrawKeypresses(sf::RenderTarget& window, Eigen::Vector2d& point, sf::Font font, int pixelSize);
+
 	static sf::Vector2f ToSF(const Eigen::Vector2d& v);
 	static Eigen::Vector2d HalfSize(const sf::RenderTarget& window);
 

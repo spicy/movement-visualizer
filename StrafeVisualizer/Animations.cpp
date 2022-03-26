@@ -534,6 +534,62 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 }
 
 
+bool Animations::PerfVelDemo(sf::RenderTarget& window)
+{
+    enum Mode
+    {
+        MODE_PERFANGLE,
+        MODE_END
+    };
+
+    static Mode mode = MODE_PERFANGLE;
+    sf::Vector2u screenDimensions = window.getSize();
+
+    static double tolerance = 0;
+    double bounce = (!animate_out) ? DrawUtil::SmoothBounce(tolerance, 0.4, 50.0) : 1.0;
+
+    // Get points
+    const Eigen::Vector2d& ptVelocity = moveablePts[0];
+    const Eigen::Vector2d& ptYaw = moveablePts[1];
+
+    RUN_ONCE
+    {
+        tolerance = 0;
+    }
+
+    sf::Font font;
+    if (font.loadFromFile("fonts/Dosis-Regular.ttf"))
+    {
+        // Draw Viewangles
+        DrawUtil::DrawLine(window, DrawUtil::center, ptYaw, viewanglesColor, false, 20.0);
+        DrawUtil::DrawPoint(window, ptYaw, viewanglesColor, 20.0);
+        DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color::White, 20.0);
+
+        ProcessMovement();
+
+        // Draw Vel arrow
+        Eigen::Vector2d ptVelocity = Eigen::Vector2d(player->velocity[0] / DrawUtil::scale, -player->velocity[1] / DrawUtil::scale);
+        DrawUtil::DrawLine(window, DrawUtil::center, ptVelocity, velocityColor, false, 20.0);
+        DrawUtil::DrawPoint(window, ptVelocity, velocityColor, 20.0);
+
+        // Draw Vel Text
+        sf::String text2 = std::to_string((int)VecMagnitude(player->velocity));
+        Eigen::Vector2d ptVel(player->velocity[0] + 20, -player->velocity[1] - 20);
+        DrawUtil::DrawTextSF(window, ptVel / DrawUtil::scale, font, text2, fontSize, velocityColor);
+
+        // Draw WishVel arrow
+        double wishspeed = VecMagnitude(player->wishVel);
+        Eigen::Vector2d ptWishVel = Eigen::Vector2d(player->wishVel[0] / wishspeed, -player->wishVel[1] / wishspeed);
+        DrawUtil::DrawLine(window, DrawUtil::center, ptWishVel, wishVelColor, false, 20.0);
+        DrawUtil::DrawPoint(window, ptWishVel, wishVelColor, 20.0);
+
+        // Draw Center point
+        DrawUtil::DrawPoint(window, DrawUtil::center, sf::Color::White, 20.0);
+    }
+    UpdateTolerance(tolerance, 0.03, 0.08);
+    return UpdateMode(mode);
+}
+
 bool Animations::End(sf::RenderTarget& window)
 {
     enum Mode

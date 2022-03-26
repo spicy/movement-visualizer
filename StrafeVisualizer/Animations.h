@@ -15,4 +15,5 @@ public:
 	static bool WishVelDemonstration(sf::RenderTarget& window);
 	static bool PerfAngleDemo(sf::RenderTarget& window);
 	static bool End(sf::RenderTarget& window);
+	static bool PerfVelDemo(sf::RenderTarget& window);
 };

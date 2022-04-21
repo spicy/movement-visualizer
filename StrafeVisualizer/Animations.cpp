@@ -279,7 +279,7 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
                 DrawUtil::DrawTextSF(window, point2, font, wishvelText, fontSize, wishVelColor);
                 DrawUtil::DrawTextSF(window, point3, font, nextvelText, fontSize, sf::Color(245, 197, 103, 255 * tolerance));
 
-                sf::String text4 = "These vectors show why higher velocities require 'slower' mouse movements.\nAs our velocity increases, the angle between our next ticks velocity and our\ncurrent velocity decreases. Pay attention to the left-most side of the triangle.";
+                sf::String text4 = "These vectors show why higher velocities require 'slower' mouse movements.\nAs our velocity increases, the angle between our next ticks velocity and our\ncurrent velocity decreases. Watch the angle between velocity and next vel.";
                 //\n\nSince we have already proved in our engine code review that maximizing speed\ngain is done by making the wishvel perpendicular to the current velocity, we\nknow that in order to make our wishvel perpendicular we can make our view\nangle our current velocity direction offsetted some specific keypress angle.\n\nIn the normal style, the perfect angle to be looking would be our current ticks\nvelocity.
 
                 DrawUtil::DrawRect(window, 50, 50, sf::Vector2f(800, 140), sf::Color(255, 255, 255, 255 * tolerance));
@@ -302,7 +302,6 @@ bool Animations::PerfAngleDemo(sf::RenderTarget& window)
     UpdateTolerance(tolerance, 0.03, 0.08);
     return UpdateMode(mode);
 }
-
 
 bool Animations::WishVelDemonstration(sf::RenderTarget& window)
 {
@@ -532,7 +531,6 @@ bool Animations::WishVelDemonstration(sf::RenderTarget& window)
     UpdateTolerance(tolerance, 0.03, 0.08);
     return UpdateMode(mode);
 }
-
 
 bool Animations::PerfVelDemo(sf::RenderTarget& window)
 {

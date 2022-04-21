@@ -495,3 +495,9 @@ packages/Costura.Fody.5.6.0/Costura.Fody.5.6.0.nupkg
 packages/Costura.Fody.5.6.0/build/Costura.Fody.targets
 packages/Costura.Fody.5.6.0/build/Costura.Fody.props
 packages/Costura.Fody.5.6.0/.signature.p7s
+Release/fonts/Dosis-Regular.ttf
+Debug/fonts/Dosis-Regular.ttf
+.vs/StrafeVisualizer/v17/Browse.VC.opendb
+.vs/StrafeVisualizer/v17/Browse.VC.db-wal
+.vs/StrafeVisualizer/v17/Browse.VC.db-shm
+.vs/StrafeVisualizer/v17/.suo
